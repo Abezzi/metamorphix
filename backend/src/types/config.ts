@@ -5,7 +5,6 @@ export type APIConfig = {
   fileserverHits: number;
   platform: string;
   jwtSecret: string;
-  polkaKey: string;
 };
 
 export type DBConfig = {
