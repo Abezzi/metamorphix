@@ -22,7 +22,7 @@ const handlerReadiness = (_req: Request, res: Response) => {
   res.send("OK");
 };
 
-// MIDLEWARES
+// MIDDLEWARES
 
 //  ENDPOINTS
 
