@@ -23,3 +23,5 @@
 </div>
 
 ![Backend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/backend-ci.yml/badge.svg)
+
+![Frontend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/frontend-ci.yml/badge.svg)
