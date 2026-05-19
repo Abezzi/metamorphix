@@ -177,7 +177,21 @@ const handlerRevoke = async (req: Request, res: Response) => {
   }
 };
 
+// middleware that logs non-ok
+const middlewareLogging = (req: Request, res: Response, next: NextFunction) => {
+  res.on("finish", () => {
+    if (res.statusCode !== 200) {
+      console.log(
+        `[NON-OK] ${req.method} ${req.url} - Status: ${res.statusCode}`,
+      );
+    }
+  });
+  next();
+};
+
 // MIDDLEWARES
+// use the middleware handler to log non-ok responses
+app.use(middlewareLogging);
 
 //  ENDPOINTS
 // create users
