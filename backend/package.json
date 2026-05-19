@@ -18,9 +18,19 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.0",
-    "typescript": "^6.0.3"
+    "prettier": "^3.8.3",
+    "tsx": "^4.22.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
   },
   "dependencies": {
     "express": "^5.2.1"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "useTabs": false,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false
   }
 }
