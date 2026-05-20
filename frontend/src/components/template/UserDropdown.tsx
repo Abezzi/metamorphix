@@ -5,6 +5,7 @@ import useAuth from '@/utils/hooks/useAuth'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import { HiOutlineLogout, HiOutlineUser } from 'react-icons/hi'
+import { useAppSelector } from '@/store'
 import type { CommonProps } from '@/@types/common'
 import type { JSX } from 'react'
 
@@ -18,13 +19,14 @@ const dropdownItemList: DropdownList[] = []
 
 const _UserDropdown = ({ className }: CommonProps) => {
     const { signOut } = useAuth()
+    const user = useAppSelector((state) => state.auth.user)
 
     const UserAvatar = (
         <div className={classNames(className, 'flex items-center gap-2')}>
             <Avatar size={32} shape="circle" icon={<HiOutlineUser />} />
             <div className="hidden md:block">
                 <div className="text-xs capitalize">admin</div>
-                <div className="font-bold">User01</div>
+                <div className="font-bold">{user.username}</div>
             </div>
         </div>
     )
@@ -41,9 +43,9 @@ const _UserDropdown = ({ className }: CommonProps) => {
                         <Avatar shape="circle" icon={<HiOutlineUser />} />
                         <div>
                             <div className="font-bold text-gray-900 dark:text-gray-100">
-                                User01
+                                {user.username}
                             </div>
-                            <div className="text-xs">user01@mail.com</div>
+                            <div className="text-xs">{user.email}</div>
                         </div>
                     </div>
                 </Dropdown.Item>
