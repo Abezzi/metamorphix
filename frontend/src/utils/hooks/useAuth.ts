@@ -35,20 +35,17 @@ function useAuth() {
         try {
             const resp = await apiSignIn(values)
             if (resp.data) {
-                const { token } = resp.data
+                const { token, refreshToken, ...userData } = resp.data
                 dispatch(signInSuccess(token))
-                if (resp.data.user) {
-                    dispatch(
-                        setUser(
-                            resp.data.user || {
-                                avatar: '',
-                                username: 'Anonymous',
-                                authority: ['USER'],
-                                email: '',
-                            },
-                        ),
-                    )
-                }
+
+                dispatch(
+                    setUser({
+                        username: userData.username || 'Anonymous',
+                        email: userData.email || '',
+                        avatar: '',
+                        authority: ['USER'],
+                    }),
+                )
                 const redirectUrl = query.get(REDIRECT_URL_KEY)
                 navigate(
                     redirectUrl
@@ -73,20 +70,17 @@ function useAuth() {
         try {
             const resp = await apiSignUp(values)
             if (resp.data) {
-                const { token } = resp.data
+                const { token, refreshToken, ...userData } = resp.data
                 dispatch(signInSuccess(token))
-                if (resp.data.user) {
-                    dispatch(
-                        setUser(
-                            resp.data.user || {
-                                avatar: '',
-                                username: 'Anonymous',
-                                authority: ['USER'],
-                                email: '',
-                            },
-                        ),
-                    )
-                }
+
+                dispatch(
+                    setUser({
+                        username: userData.username || 'Anonymous',
+                        email: userData.email || '',
+                        avatar: '',
+                        authority: ['USER'],
+                    }),
+                )
                 const redirectUrl = query.get(REDIRECT_URL_KEY)
                 navigate(
                     redirectUrl
