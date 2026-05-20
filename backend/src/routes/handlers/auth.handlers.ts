@@ -10,6 +10,7 @@ import {
 import {
   createUser,
   getUserByEmail,
+  getUserByUsername,
   updateUsers,
 } from "../../db/queries/users.js";
 import {
@@ -53,17 +54,17 @@ export const createUserHandler = async (req: Request, res: Response) => {
 
 export const loginHandler = async (req: Request, res: Response) => {
   try {
-    const { password, email } = req.body;
+    const { password, username } = req.body;
 
-    if (!password || !email) {
+    if (!password || !username) {
       res.status(400).json({ error: "password and email are required" });
       return;
     }
 
-    const user = await getUserByEmail(email);
+    const user = await getUserByUsername(username);
 
     if (!user || !(await checkPasswordHash(password, user.hashedPassword))) {
-      res.status(401).json({ error: "incorrect email or password" });
+      res.status(401).json({ error: "incorrect username or password" });
       return;
     }
 
@@ -83,6 +84,18 @@ export const loginHandler = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(401).json({ error: "incorrect email or password" });
+  }
+};
+
+export const signOutHandler = async (req: Request, res: Response) => {
+  try {
+    const refreshTokenStr = getBearerToken(req);
+    await revokeRefreshToken(refreshTokenStr);
+    res.status(204).end(); // No Content - success
+  } catch (error) {
+    // Even if token is invalid/expired, we can consider logout successful
+    // (defensive approach - common in auth systems)
+    res.status(204).end();
   }
 };
 

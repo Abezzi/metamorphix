@@ -29,6 +29,16 @@ export async function getUserByEmail(email: string) {
   return result[0];
 }
 
+export async function getUserByUsername(username: string) {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
+
+  return result[0];
+}
+
 export async function updateUsers(
   email: string,
   username: string,
