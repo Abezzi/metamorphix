@@ -9,8 +9,8 @@ import {
 
 const authRouter = Router();
 
-authRouter.post("/register", createUserHandler);
-authRouter.post("/login", loginHandler);
+authRouter.post("/sign-up", createUserHandler);
+authRouter.post("/sign-in", loginHandler);
 authRouter.put("/profile", updateUserHandler);
 authRouter.post("/refresh", refreshHandler);
 authRouter.post("/revoke", revokeHandler);

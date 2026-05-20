@@ -2,10 +2,14 @@ import { eq } from "drizzle-orm";
 import { db } from "../index.js";
 import { users } from "../schema.js";
 
-export async function createUser(email: string, hashedPassword: string) {
+export async function createUser(
+  email: string,
+  username: string,
+  hashedPassword: string,
+) {
   const [result] = await db
     .insert(users)
-    .values({ email, hashedPassword })
+    .values({ email, username, hashedPassword })
     .onConflictDoNothing()
     .returning();
   return result;
@@ -27,6 +31,7 @@ export async function getUserByEmail(email: string) {
 
 export async function updateUsers(
   email: string,
+  username: string,
   hashedPassword: string,
   userID: string,
 ) {
@@ -34,12 +39,14 @@ export async function updateUsers(
     .update(users)
     .set({
       email,
+      username,
       hashedPassword,
       updatedAt: new Date(),
     })
     .where(eq(users.id, userID))
     .returning({
       id: users.id,
+      username: users.username,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
       email: users.email,

@@ -20,20 +20,24 @@ import {
 
 export const createUserHandler = async (req: Request, res: Response) => {
   try {
-    const { password, email } = req.body;
+    const { password, email, username } = req.body;
 
     if (
       !email ||
       typeof email !== "string" ||
       !password ||
-      typeof password !== "string"
+      typeof password !== "string" ||
+      !username ||
+      typeof username !== "string"
     ) {
-      res.status(400).json({ error: "email and password are required" });
+      res
+        .status(400)
+        .json({ error: "email, username and password are required" });
       return;
     }
 
     const hashedPasswordHandler = await hashPassword(password);
-    const user = await createUser(email, hashedPasswordHandler);
+    const user = await createUser(email, username, hashedPasswordHandler);
 
     if (!user) {
       res.status(400).json({ error: "user already exists" });
@@ -73,6 +77,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
       email: response.email,
+      username: response.username,
       token: accessToken,
       refreshToken: refreshRecord.token,
     });
@@ -86,10 +91,14 @@ export const updateUserHandler = async (req: Request, res: Response) => {
     const token = getBearerToken(req);
     const userID = validateJWT(token, apiConfig.jwtSecret);
 
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
 
     if (!email || typeof email !== "string") {
       res.status(400).json({ error: "email is required" });
+      return;
+    }
+    if (!username || typeof username !== "string") {
+      res.status(400).json({ error: "username is required" });
       return;
     }
     if (!password || typeof password !== "string") {
@@ -98,7 +107,12 @@ export const updateUserHandler = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    const updatedUser = await updateUsers(email, hashedPassword, userID);
+    const updatedUser = await updateUsers(
+      email,
+      username,
+      hashedPassword,
+      userID,
+    );
 
     if (!updatedUser) {
       res.status(404).json({ error: "user not found" });
@@ -108,6 +122,7 @@ export const updateUserHandler = async (req: Request, res: Response) => {
     res.status(200).json({
       id: updatedUser.id,
       email: updatedUser.email,
+      username: updatedUser.username,
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
     });

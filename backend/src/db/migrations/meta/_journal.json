@@ -8,6 +8,13 @@
       "when": 1779212532296,
       "tag": "0000_minor_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779294267387,
+      "tag": "0001_abnormal_william_stryker",
+      "breakpoints": true
     }
   ]
 }
