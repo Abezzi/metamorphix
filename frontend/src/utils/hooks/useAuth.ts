@@ -27,9 +27,9 @@ function useAuth() {
         values: SignInCredential,
     ): Promise<
         | {
-              status: Status
-              message: string
-          }
+            status: Status
+            message: string
+        }
         | undefined
     > => {
         try {
@@ -42,7 +42,7 @@ function useAuth() {
                         setUser(
                             resp.data.user || {
                                 avatar: '',
-                                userName: 'Anonymous',
+                                username: 'Anonymous',
                                 authority: ['USER'],
                                 email: '',
                             },
@@ -80,7 +80,7 @@ function useAuth() {
                         setUser(
                             resp.data.user || {
                                 avatar: '',
-                                userName: 'Anonymous',
+                                username: 'Anonymous',
                                 authority: ['USER'],
                                 email: '',
                             },
@@ -112,7 +112,7 @@ function useAuth() {
         dispatch(
             setUser({
                 avatar: '',
-                userName: '',
+                username: '',
                 email: '',
                 authority: [],
             }),

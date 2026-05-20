@@ -4,16 +4,16 @@ import isEmpty from 'lodash/isEmpty'
 
 export default function authFakeApi(server: Server, apiPrefix: string) {
     server.post(`${apiPrefix}/sign-in`, (schema, { requestBody }) => {
-        const { userName, password } = JSON.parse(requestBody)
+        const { username, password } = JSON.parse(requestBody)
         const user = schema.db.signInUserData.findBy({
-            accountUserName: userName,
+            accountUserName: username,
             password,
         })
         console.log('user', user)
         if (user) {
-            const { avatar, userName, email, authority } = user
+            const { avatar, username, email, authority } = user
             return {
-                user: { avatar, userName, email, authority },
+                user: { avatar, username, email, authority },
                 token: 'wVYrxaeNa9OxdnULvde1Au5m5w63',
             }
         }
@@ -29,14 +29,14 @@ export default function authFakeApi(server: Server, apiPrefix: string) {
     })
 
     server.post(`${apiPrefix}/sign-up`, (schema, { requestBody }) => {
-        const { userName, password, email } = JSON.parse(requestBody)
+        const { username, password, email } = JSON.parse(requestBody)
         const userExist = schema.db.signInUserData.findBy({
-            accountUserName: userName,
+            accountUserName: username,
         })
         const emailUsed = schema.db.signInUserData.findBy({ email })
         const newUser = {
             avatar: '/img/avatars/thumb-1.jpg',
-            userName,
+            username,
             email,
             authority: ['admin', 'user'],
         }
@@ -64,7 +64,7 @@ export default function authFakeApi(server: Server, apiPrefix: string) {
 
         schema.db.signInUserData.insert({
             ...newUser,
-            ...{ id: uniqueId('user_'), password, accountUserName: userName },
+            ...{ id: uniqueId('user_'), password, accountUserName: username },
         })
         return {
             user: newUser,

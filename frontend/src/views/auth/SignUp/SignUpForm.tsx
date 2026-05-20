@@ -16,13 +16,13 @@ interface SignUpFormProps extends CommonProps {
 }
 
 type SignUpFormSchema = {
-    userName: string
+    username: string
     password: string
     email: string
 }
 
 const validationSchema = Yup.object().shape({
-    userName: Yup.string().required('Please enter your user name'),
+    username: Yup.string().required('Please enter your user name'),
     email: Yup.string()
         .email('Invalid email')
         .required('Please enter your email'),
@@ -44,9 +44,9 @@ const SignUpForm = (props: SignUpFormProps) => {
         values: SignUpFormSchema,
         setSubmitting: (isSubmitting: boolean) => void,
     ) => {
-        const { userName, password, email } = values
+        const { username, password, email } = values
         setSubmitting(true)
-        const result = await signUp({ userName, password, email })
+        const result = await signUp({ username, password, email })
 
         if (result?.status === 'failed') {
             setMessage(result.message)
@@ -64,7 +64,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             )}
             <Formik
                 initialValues={{
-                    userName: 'admin1',
+                    username: 'admin1',
                     password: '123Qwe1',
                     confirmPassword: '123Qwe1',
                     email: 'test@testmail.com',
@@ -83,13 +83,13 @@ const SignUpForm = (props: SignUpFormProps) => {
                         <FormContainer>
                             <FormItem
                                 label="User Name"
-                                invalid={errors.userName && touched.userName}
-                                errorMessage={errors.userName}
+                                invalid={errors.username && touched.username}
+                                errorMessage={errors.username}
                             >
                                 <Field
                                     type="text"
                                     autoComplete="off"
-                                    name="userName"
+                                    name="username"
                                     placeholder="User Name"
                                     component={Input}
                                 />
