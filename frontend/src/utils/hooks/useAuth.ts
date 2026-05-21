@@ -94,9 +94,20 @@ function useAuth() {
             }
             // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         } catch (errors: any) {
+            let errorMessage = 'Something went wrong. Please try again.';
+
+            // extract clean message from backend
+            if (errors.response?.data?.error) {
+                errorMessage = errors.response.data.error;
+            } else if (errors.response?.data?.message) {
+                errorMessage = errors.response.data.message;
+            } else if (errors.message) {
+                errorMessage = errors.message;
+            }
+
             return {
                 status: 'failed',
-                message: errors?.response?.data?.message || errors.toString(),
+                message: errorMessage,
             }
         }
     }

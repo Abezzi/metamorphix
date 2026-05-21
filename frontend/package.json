@@ -11,7 +11,10 @@
     "lint:fix": "npm run lint -- --fix",
     "prettier": "npx prettier src --check",
     "prettier:fix": "npm run prettier -- --write",
-    "format": "npm run prettier:fix && npm run lint:fix"
+    "format": "npm run prettier:fix && npm run lint:fix",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.2",
@@ -62,6 +65,9 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/typography": "^0.5.9",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/d3-fetch": "^3.0.2",
     "@types/d3-scale": "^4.0.3",
     "@types/lodash": "^4.14.191",
@@ -88,6 +94,7 @@
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
+    "jsdom": "^29.1.1",
     "postcss": "^8.4.21",
     "postcss-cli": "^11.0.0",
     "postcss-nesting": "^12.0.2",
@@ -97,7 +104,8 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^7.0.5",
-    "vite-plugin-dynamic-import": "^1.6.0"
+    "vite-plugin-dynamic-import": "^1.6.0",
+    "vitest": "^4.1.7"
   },
   "overrides": {
     "react-simple-maps": {
