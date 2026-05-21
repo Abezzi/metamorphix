@@ -29,7 +29,7 @@ describe('SignUpForm', () => {
   it('renders all form fields and submit button', () => {
     renderComponent();
 
-    expect(screen.getByPlaceholderText('User Name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Username')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Confirm Password')).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('SignUpForm', () => {
     const user = userEvent.setup();
     renderComponent();
 
-    await user.type(screen.getByPlaceholderText('User Name'), 'testuser');
+    await user.type(screen.getByPlaceholderText('Username'), 'testuser');
     await user.type(screen.getByPlaceholderText('Email'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Password'), 'Password123!');
     await user.type(screen.getByPlaceholderText('Confirm Password'), 'WrongPass123!');
@@ -71,7 +71,7 @@ describe('SignUpForm', () => {
   //
   //   renderComponent();
   //
-  //   await user.type(screen.getByPlaceholderText('User Name'), 'insomnia');
+  //   await user.type(screen.getByPlaceholderText('Username'), 'insomnia');
   //   await user.type(screen.getByPlaceholderText('Email'), 'insomnia@test.com');
   //   await user.type(screen.getByPlaceholderText('Password'), '123123123');
   //   await user.type(screen.getByPlaceholderText('Confirm Password'), '123123123');
@@ -99,7 +99,7 @@ describe('SignUpForm', () => {
   //
   //   renderComponent();
   //
-  //   await user.type(screen.getByPlaceholderText('User Name'), 'insomnia');
+  //   await user.type(screen.getByPlaceholderText('Username'), 'insomnia');
   //   await user.type(screen.getByPlaceholderText('Email'), 'insomnia@test.com');
   //   await user.type(screen.getByPlaceholderText('Password'), '123123123');
   //   await user.type(screen.getByPlaceholderText('Confirm Password'), '123123123');
@@ -115,7 +115,7 @@ describe('SignUpForm', () => {
     const user = userEvent.setup();
     renderComponent({ disableSubmit: true });
 
-    await user.type(screen.getByPlaceholderText('User Name'), 'testuser');
+    await user.type(screen.getByPlaceholderText('Username'), 'testuser');
     await user.type(screen.getByPlaceholderText('Email'), 'test@example.com');
     await user.type(screen.getByPlaceholderText('Password'), 'Password123!');
     await user.type(screen.getByPlaceholderText('Confirm Password'), 'Password123!');
@@ -128,7 +128,7 @@ describe('SignUpForm', () => {
   it('uses default initial values', () => {
     renderComponent();
 
-    expect(screen.getByPlaceholderText('User Name')).toHaveValue('admin1');
+    expect(screen.getByPlaceholderText('Username')).toHaveValue('admin1');
     expect(screen.getByPlaceholderText('Email')).toHaveValue('test@testmail.com');
   });
 });
