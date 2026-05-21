@@ -1,20 +1,40 @@
 {
     "nav": {
         "home": "Home",
-        "singleMenuItem": "Single menu item",
-        "collapseMenu": {
-            "collapseMenu": "Collapse menu item",
-            "item1": "Collapse menu item 1",
-            "item2": "Collapse menu item 2"
+        "dashboard": {
+            "dashboard": "Dashboard"
         },
-        "groupMenu": {
-            "groupMenu": "Group menu",
-            "single": "Group single menu item",
-            "collapse": {
-                "collapse": "Group collapse menu",
-                "item1": "Group collapse menu item 1",
-                "item2": "Group collapse menu item 2"
-            }
+        "pipelines": {
+            "pipelines": "Pipelines",
+            "sources": "Sources"
+        },
+        "actions": {
+            "actions": "Actions",
+            "library": "Library",
+            "templates": "Templates"
+        },
+        "actions": {
+            "actions": "Actions",
+            "library": "Library",
+            "templates": "Templates"
+        },
+        "jobsAndMonitoring": {
+            "jobsAndMonitoring": "Jobs & Monitoring",
+            "activeJobs": "Active Jobs",
+            "jobHistory": "Job History",
+            "deliveryAttempts": "Delivery Attempts"
+        },
+        "subscribers": {
+            "subscribers": "Subscribers",
+            "allSubscribers": "All Subscribers",
+            "deliveryRules": "Delivery Rules"
+        },
+        "settings": {
+            "settings": "Settings",
+            "apiAndWebhooks": "Api & Webhooks",
+            "workersAndInfrastructure": "Workers And Infrastructure",
+            "notifications": "Notifications",
+            "general": "General"
         }
     }
 }
