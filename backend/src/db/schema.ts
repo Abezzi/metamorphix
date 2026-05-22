@@ -1,5 +1,13 @@
-import { sql } from "drizzle-orm";
-import { pgTable, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import {
+  pgTable,
+  timestamp,
+  varchar,
+  uuid,
+  text,
+  jsonb,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -17,6 +25,7 @@ export const users = pgTable("users", {
     .array()
     .notNull()
     .default(sql`ARRAY[]::text[]`),
+  apiKey: text("api_key").notNull().unique(),
 });
 
 export const sourceURL = pgTable("source_url", {
@@ -46,6 +55,50 @@ export const refreshTokens = pgTable("refresh_tokens", {
   expiresAt: timestamp("expires_at").notNull(),
   revokedAt: timestamp("revoked_at"),
 });
+
+export const pipelines = pgTable("pipelines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  sourceUrl: text("source_url").unique().notNull(),
+  actionType: text("action_type").notNull(), // e.g. 'transform', 'filter', 'enrich', 'webhook-forward'
+  actionConfig: jsonb("action_config").notNull().default("{}"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const subscribers = pgTable("subscribers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  pipelineId: uuid("pipeline_id").references(() => pipelines.id, {
+    onDelete: "cascade",
+  }),
+  url: text("url").notNull(),
+  method: text("method").default("POST"),
+  headers: jsonb("headers").default("{}"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const pipelinesRelations = relations(pipelines, ({ one, many }) => ({
+  users: one(users, {
+    fields: [pipelines.userId],
+    references: [users.id],
+  }),
+  subscribers: many(subscribers),
+}));
+
+export const subscribersRelations = relations(subscribers, ({ one }) => ({
+  pipeline: one(pipelines, {
+    fields: [subscribers.pipelineId],
+    references: [pipelines.id],
+  }),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  pipelines: many(pipelines),
+}));
 
 export type SourceURL = typeof sourceURL.$inferSelect;
 export type User = typeof users.$inferSelect;

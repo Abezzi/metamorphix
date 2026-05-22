@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 import crypto from "crypto";
+import { IncomingHttpHeaders } from "http";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
@@ -72,8 +73,8 @@ export const makeRefreshToken = (): string => {
 };
 
 // extract apikey from authorization header or throw
-export const getAPIKey = (req: Request): string => {
-  const authHeader = req.headers.authorization;
+export const getAPIKey = (headers: IncomingHttpHeaders): string | null => {
+  const authHeader = headers["authorization"];
 
   if (!authHeader) {
     throw new Error("no authorization header");

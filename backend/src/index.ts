@@ -8,8 +8,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { loggingMiddleware } from "./middlewares/logging.js";
 
 // import routers
-import authRouter from "./routes/auth.js";
 import healthRouter from "./routes/health.js";
+import authRouter from "./routes/auth.js";
+import pipelineRouter from "./routes/pipeline.js";
 
 const app = express();
 const PORT = 8080;
@@ -26,14 +27,14 @@ app.use(loggingMiddleware);
 //  routes
 const apiRouter = express.Router();
 
-//
-apiRouter.use("/auth", authRouter);
 apiRouter.use(healthRouter);
+apiRouter.use("/auth", authRouter);
+apiRouter.use("/pipelines", pipelineRouter);
 
 // mount the main api router
 app.use("/api", apiRouter);
 
-// 404 Handler
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     error: "Route not found",

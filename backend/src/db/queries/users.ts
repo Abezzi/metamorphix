@@ -7,10 +7,11 @@ export async function createUser(
   username: string,
   hashedPassword: string,
   authority: string[] = ["user"],
+  apiKey: string,
 ) {
   const [result] = await db
     .insert(users)
-    .values({ email, username, hashedPassword, authority })
+    .values({ email, username, hashedPassword, authority, apiKey })
     .onConflictDoNothing()
     .returning();
   return result;
@@ -35,6 +36,16 @@ export async function getUserByUsername(username: string) {
     .select()
     .from(users)
     .where(eq(users.username, username))
+    .limit(1);
+
+  return result[0];
+}
+
+export async function getUserByApiKey(apiKey: string) {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.apiKey, apiKey))
     .limit(1);
 
   return result[0];
