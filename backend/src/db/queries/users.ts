@@ -6,7 +6,7 @@ export async function createUser(
   email: string,
   username: string,
   hashedPassword: string,
-  authority: string[] = ["USER"],
+  authority: string[] = ["user"],
 ) {
   const [result] = await db
     .insert(users)
