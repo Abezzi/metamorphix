@@ -21,6 +21,10 @@ export async function deleteAllUsers() {
   await db.delete(users);
 }
 
+export async function deleteUserById(id: string) {
+  await db.delete(users).where(eq(users.id, id));
+}
+
 export async function getUserByEmail(email: string) {
   const result = await db
     .select()
@@ -75,4 +79,10 @@ export async function updateUsers(
     });
 
   return updatedUser;
+}
+
+export class UserService {
+  async delete(id: string) {
+    await db.delete(users).where(eq(users.id, id));
+  }
 }

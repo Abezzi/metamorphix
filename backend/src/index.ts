@@ -11,6 +11,7 @@ import { loggingMiddleware } from "./middlewares/logging.js";
 import healthRouter from "./routes/health.js";
 import authRouter from "./routes/auth.js";
 import pipelineRouter from "./routes/pipeline.js";
+import userRouter from "./routes/users.js";
 
 const app = express();
 const PORT = 8080;
@@ -30,6 +31,7 @@ const apiRouter = express.Router();
 apiRouter.use(healthRouter);
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/pipelines", pipelineRouter);
+apiRouter.use("/users", userRouter);
 
 // mount the main api router
 app.use("/api", apiRouter);
