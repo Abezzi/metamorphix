@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1779212532296,
-      "tag": "0000_minor_deathbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1779294267387,
-      "tag": "0001_abnormal_william_stryker",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1779449545816,
-      "tag": "0002_breezy_dorian_gray",
+      "when": 1779464506126,
+      "tag": "0000_neat_energizer",
       "breakpoints": true
     }
   ]
