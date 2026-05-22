@@ -11,6 +11,7 @@ import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { useNavigate } from 'react-router-dom'
 import useQuery from './useQuery'
 import type { SignInCredential, SignUpCredential } from '@/@types/auth'
+import { USER } from '@/constants/roles.constant'
 
 type Status = 'success' | 'failed'
 
@@ -43,7 +44,7 @@ function useAuth() {
                         username: userData.username || 'Anonymous',
                         email: userData.email || '',
                         avatar: '',
-                        authority: ['USER'],
+                        authority: userData.authority || [USER],
                     }),
                 )
                 const redirectUrl = query.get(REDIRECT_URL_KEY)
@@ -94,15 +95,15 @@ function useAuth() {
             }
             // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         } catch (errors: any) {
-            let errorMessage = 'Something went wrong. Please try again.';
+            let errorMessage = 'Something went wrong. Please try again.'
 
             // extract clean message from backend
             if (errors.response?.data?.error) {
-                errorMessage = errors.response.data.error;
+                errorMessage = errors.response.data.error
             } else if (errors.response?.data?.message) {
-                errorMessage = errors.response.data.message;
+                errorMessage = errors.response.data.message
             } else if (errors.message) {
-                errorMessage = errors.message;
+                errorMessage = errors.message
             }
 
             return {

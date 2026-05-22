@@ -15,6 +15,13 @@
       "when": 1779294267387,
       "tag": "0001_abnormal_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779449545816,
+      "tag": "0002_breezy_dorian_gray",
+      "breakpoints": true
     }
   ]
 }

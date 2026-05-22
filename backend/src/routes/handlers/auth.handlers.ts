@@ -79,6 +79,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       updatedAt: response.updatedAt,
       email: response.email,
       username: response.username,
+      authority: response.authority,
       token: accessToken,
       refreshToken: refreshRecord.token,
     });

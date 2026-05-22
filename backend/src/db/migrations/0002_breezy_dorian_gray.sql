@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "authority" text[] DEFAULT ARRAY[]::text[] NOT NULL;

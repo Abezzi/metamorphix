@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { pgTable, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -12,6 +13,10 @@ export const users = pgTable("users", {
   hashedPassword: varchar("hashed_password", { length: 255 })
     .notNull()
     .default("unset"),
+  authority: text()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
 });
 
 export const sourceURL = pgTable("source_url", {

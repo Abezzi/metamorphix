@@ -6,10 +6,11 @@ export async function createUser(
   email: string,
   username: string,
   hashedPassword: string,
+  authority: string[] = ["USER"],
 ) {
   const [result] = await db
     .insert(users)
-    .values({ email, username, hashedPassword })
+    .values({ email, username, hashedPassword, authority })
     .onConflictDoNothing()
     .returning();
   return result;
