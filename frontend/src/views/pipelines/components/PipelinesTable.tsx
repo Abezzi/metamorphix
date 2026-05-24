@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useMemo } from 'react'
-import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import DataTable from '@/components/shared/DataTable'
 import {
@@ -13,15 +12,9 @@ import {
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
 import PipelineEditDialog from './PipelineEditDialog'
-import { Link } from 'react-router-dom'
 import dayjs from 'dayjs'
 import cloneDeep from 'lodash/cloneDeep'
 import type { OnSortParam, ColumnDef } from '@/components/shared/DataTable'
-
-const statusColor: Record<string, string> = {
-  active: 'bg-emerald-500',
-  blocked: 'bg-red-500',
-}
 
 const ActionColumn = ({ row }: { row: Pipeline }) => {
   const { textTheme } = useThemeClass()
@@ -38,22 +31,6 @@ const ActionColumn = ({ row }: { row: Pipeline }) => {
       onClick={onEdit}
     >
       Edit
-    </div>
-  )
-}
-
-const NameColumn = ({ row }: { row: Pipeline }) => {
-  const { textTheme } = useThemeClass()
-
-  return (
-    <div className="flex items-center">
-      <Avatar size={28} shape="circle" src={row.img} />
-      <Link
-        className={`hover:${textTheme} ml-2 rtl:mr-2 font-semibold`}
-        to={`/app/crm/pipeline-details?id=${row.id}`}
-      >
-        {row.name}
-      </Link>
     </div>
   )
 }
@@ -88,38 +65,56 @@ const AllPipelines = () => {
       {
         header: 'Name',
         accessorKey: 'name',
-        cell: (props) => {
-          const row = props.row.original
-          return <NameColumn row={row} />
-        },
       },
       {
-        header: 'Email',
-        accessorKey: 'email',
+        header: 'Source URL',
+        accessorKey: 'sourceUrl',
       },
       {
-        header: 'Status',
-        accessorKey: 'status',
+        header: 'Action Type',
+        accessorKey: 'actionType',
+      },
+      {
+        header: 'Active',
+        accessorKey: 'isActive',
         cell: (props) => {
           const row = props.row.original
           return (
             <div className="flex items-center">
-              <Badge className={statusColor[row.status]} />
+              <Badge
+                className={
+                  row.isActive
+                    ? 'bg-emerald-500'
+                    : 'bg-red-500'
+                }
+              />
               <span className="ml-2 rtl:mr-2 capitalize">
-                {row.status}
+                {row.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>
           )
         },
       },
       {
-        header: 'Last online',
-        accessorKey: 'lastOnline',
+        header: 'Created At',
+        accessorKey: 'createdAt',
         cell: (props) => {
           const row = props.row.original
           return (
             <div className="flex items-center">
-              {dayjs.unix(row.lastOnline).format('MM/DD/YYYY')}
+              {dayjs(row.createdAt).format('MM/DD/YYYY')}
+            </div>
+          )
+        },
+      },
+      {
+        header: 'Updated At',
+        accessorKey: 'updatedAt',
+        cell: (props) => {
+          const row = props.row.original
+          return (
+            <div className="flex items-center">
+              {dayjs(row.createdAt).format('MM/DD/YYYY')}
             </div>
           )
         },

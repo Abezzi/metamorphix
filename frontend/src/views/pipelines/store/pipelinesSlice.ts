@@ -6,54 +6,15 @@ import {
 } from '@/services/PipelineService'
 import type { TableQueries } from '@/@types/common'
 
-type PersonalInfo = {
-  location: string
-  title: string
-  birthday: string
-  phoneNumber: string
-  facebook: string
-  twitter: string
-  pinterest: string
-  linkedIn: string
-}
-
-type OrderHistory = {
-  id: string
-  item: string
-  status: string
-  amount: number
-  date: number
-}
-
-type PaymentMethod = {
-  cardHolderName: string
-  cardType: string
-  expMonth: string
-  expYear: string
-  last4Number: string
-  primary: boolean
-}
-
-type Subscription = {
-  plan: string
-  status: string
-  billing: string
-  nextPaymentDate: number
-  amount: number
-}
-
 export type Pipeline = {
   id: string
   name: string
-  email: string
-  img: string
-  role: string
-  lastOnline: number
-  status: string
-  personalInfo: PersonalInfo
-  orderHistory: OrderHistory[]
-  paymentMethod: PaymentMethod[]
-  subscription: Subscription[]
+  sourceUrl: string
+  actionType: string
+  actionConfig: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 type Statistic = {
@@ -71,12 +32,12 @@ type Filter = {
   status: string
 }
 
-type GetCrmPipelinesResponse = {
+type GetPipelinesResponse = {
   data: Pipeline[]
   total: number
 }
 
-type GetCrmPipelinesStatisticResponse = PipelineStatistic
+type GetPipelinesStatisticResponse = PipelineStatistic
 
 export type PipelinesState = {
   loading: boolean
@@ -95,7 +56,7 @@ export const getPipelineStatistic = createAsyncThunk(
   'crmPipelines/data/getPipelineStatistic',
   async () => {
     const response =
-      await apiGetPipelinesStatistic<GetCrmPipelinesStatisticResponse>()
+      await apiGetPipelinesStatistic<GetPipelinesStatisticResponse>()
     return response.data
   },
 )
@@ -104,8 +65,8 @@ export const getPipelines = createAsyncThunk(
   'crmPipelines/data/getPipelines',
   async (data: TableQueries & { filterData?: Filter }) => {
     const response = await apiGetPipelines<
-      GetCrmPipelinesResponse,
-      TableQueries
+      GetPipelinesResponse,
+      TableQueries & { filterData?: Filter }
     >(data)
     return response.data
   },

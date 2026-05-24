@@ -15,12 +15,12 @@ export async function apiGetCalendar<T>() {
 }
 
 export async function apiGetPipelines<T, U extends Record<string, unknown>>(
-  data: U,
+  params: U,
 ) {
   return ApiService.fetchData<T>({
     url: '/pipelines',
     method: 'get',
-    data,
+    params,
   })
 }
 
