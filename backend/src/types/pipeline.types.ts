@@ -17,6 +17,7 @@ export interface CreatePipelineDto {
   description: string;
   actionType: ActionType;
   actionConfig?: Record<string, any>;
+  isActive: boolean;
   subscribers?: Array<{
     url: string;
     method?: string;

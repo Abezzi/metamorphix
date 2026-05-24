@@ -23,7 +23,7 @@ type InitialData = {
   description?: string
   actionType?: string
   actionConfig?: string
-  boolean?: boolean
+  isActive?: boolean
 }
 
 export type FormModel = Omit<InitialData, 'tags'> & {
@@ -106,7 +106,7 @@ const PipelineForm = forwardRef<FormikRef, PipelineForm>((props, ref) => {
       description: '',
       actionType: '',
       actionConfig: '',
-      boolean: false,
+      isActive: false,
     },
     onFormSubmit,
     onDiscard,

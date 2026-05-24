@@ -33,9 +33,11 @@ export class PipelineService {
       .insert(pipelines)
       .values({
         name: data.name,
+        description: data.description,
         sourceUrl: `/webhooks/${crypto.randomUUID()}`,
         actionType: data.actionType,
         actionConfig: data.actionConfig || {},
+        isActive: data.isActive || false,
         userId,
       })
       .returning();
@@ -73,12 +75,13 @@ export class PipelineService {
         or(
           like(pipelines.name, `%${search}%`),
           like(pipelines.sourceUrl, `%${search}%`),
+          like(pipelines.actionType, `%${search}%`),
         ),
       );
     }
 
     // filters
-    if (filterData?.isActive) {
+    if (filterData?.isActive !== undefined) {
       whereConditions.push(eq(pipelines.isActive, filterData.isActive));
     }
     if (filterData?.actionType) {
@@ -88,14 +91,26 @@ export class PipelineService {
     const whereClause =
       whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
+    const validSortFields = [
+      "name",
+      "createdAt",
+      "updatedAt",
+      "isActive",
+      "actionType",
+      "sourceUrl",
+    ];
+    const finalSort = validSortFields.includes(sort as string)
+      ? sort
+      : "createdAt";
+
     // main query with pagination, sorting and relations
     const data = await db.query.pipelines.findMany({
       where: whereClause,
       with: { subscribers: true },
       orderBy: [
         order === "asc"
-          ? asc(pipelines[sort as keyof typeof pipelines] as any)
-          : desc(pipelines[sort as keyof typeof pipelines] as any),
+          ? asc(pipelines[finalSort as keyof typeof pipelines] as any)
+          : desc(pipelines[finalSort as keyof typeof pipelines] as any),
       ],
       limit,
       offset,

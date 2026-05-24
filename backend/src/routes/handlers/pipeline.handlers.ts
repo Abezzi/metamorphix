@@ -7,6 +7,7 @@ import {
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { respondWithError, respondWithJSON } from "../../utils/response.js";
 import { AuthRequest } from "../../middlewares/auth.js";
+import { parseFilterData } from "../../utils/queryParser.js";
 
 const service = new PipelineService();
 
@@ -15,8 +16,14 @@ export const createPipelineHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const user = req.user!;
 
-    const { name, description, actionType, actionConfig, subscribers } =
-      req.body;
+    const {
+      name,
+      description,
+      actionType,
+      actionConfig,
+      isActive,
+      subscribers,
+    } = req.body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       respondWithError(
@@ -52,6 +59,7 @@ export const createPipelineHandler = asyncHandler(
       description: description || "",
       actionType: actionType as any,
       actionConfig: actionConfig || {},
+      isActive: isActive || false,
       subscribers: subscribers || [],
     };
 
@@ -71,27 +79,25 @@ export const getAllPipelinesHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const user = req.user!;
 
-    const {
-      pageIndex = 1,
-      pageSize = 10,
-      sort = "createdAt",
-      order = "desc",
-      query = "",
-      filterData,
-    } = req.query;
+    const { pageIndex = 1, pageSize = 10, query = "" } = req.query;
 
     const page = Number(pageIndex);
     const limit = Number(pageSize);
     const offset = (page - 1) * limit;
+    const filterData = parseFilterData(req.query);
+
+    // parse sort
+    const sortKey = req.query["sort[key]"] || "createdAt";
+    const sortOrder = (req.query["sort[order]"] as string) || "desc";
 
     const { data, total } = await service.getAllPipelines({
       page,
       limit,
       offset,
-      sort: String(sort),
-      order: order === "asc" ? "asc" : "desc",
+      sort: String(sortKey),
+      order: sortOrder === "asc" ? "asc" : "desc",
       search: String(query),
-      filterData: filterData ? JSON.parse(String(filterData)) : undefined,
+      filterData,
       userId: user.id,
     });
 

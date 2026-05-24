@@ -9,6 +9,7 @@ import type { TableQueries } from '@/@types/common'
 export type Pipeline = {
   id: string
   name: string
+  description: string
   sourceUrl: string
   actionType: string
   actionConfig: string
@@ -29,7 +30,7 @@ type PipelineStatistic = {
 }
 
 type Filter = {
-  status: string
+  isActive: string
 }
 
 type GetPipelinesResponse = {
@@ -92,7 +93,7 @@ export const initialTableData: TableQueries = {
 }
 
 export const initialFilterData = {
-  status: '',
+  isActive: '',
 }
 
 const initialState: PipelinesState = {

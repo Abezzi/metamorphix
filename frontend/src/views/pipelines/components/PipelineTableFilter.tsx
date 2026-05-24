@@ -10,7 +10,7 @@ import {
 import { HiCheck } from 'react-icons/hi'
 
 type Option = {
-  value: string
+  value: string | boolean
   label: string
   color: string
 }
@@ -19,8 +19,8 @@ const { Control } = components
 
 const options: Option[] = [
   { value: '', label: 'All', color: 'bg-gray-500' },
-  { value: 'active', label: 'Active', color: 'bg-emerald-500' },
-  { value: 'blocked', label: 'Blocked', color: 'bg-red-500' },
+  { value: true, label: 'Active', color: 'bg-emerald-500' },
+  { value: false, label: 'Blocked', color: 'bg-red-500' },
 ]
 
 const CustomSelectOption = ({
@@ -64,12 +64,12 @@ const CustomControl = ({ children, ...props }: ControlProps<Option>) => {
 const PipelineTableFilter = () => {
   const dispatch = useAppDispatch()
 
-  const { status } = useAppSelector(
+  const { isActive } = useAppSelector(
     (state) => state.crmPipelines.data.filterData,
   )
 
-  const onStatusFilterChange = (selected: SingleValue<Option>) => {
-    dispatch(setFilterData({ status: selected?.value }))
+  const onIsActiveFilterChange = (selected: SingleValue<Option>) => {
+    dispatch(setFilterData({ isActive: selected?.value }))
   }
 
   return (
@@ -81,8 +81,8 @@ const PipelineTableFilter = () => {
         Option: CustomSelectOption,
         Control: CustomControl,
       }}
-      value={options.filter((option) => option.value === status)}
-      onChange={onStatusFilterChange}
+      value={options.filter((option) => option.value === isActive)}
+      onChange={onIsActiveFilterChange}
     />
   )
 }

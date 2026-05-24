@@ -3,6 +3,7 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import Input from '@/components/ui/Input'
 import { FormItem } from '@/components/ui/Form'
 import { Field, FormikErrors, FormikTouched, FieldProps } from 'formik'
+import { Switcher } from '@/components/ui'
 
 type FormFieldsName = {
   name: string
@@ -87,13 +88,18 @@ const BasicInformationFields = (props: BasicInformationFields) => {
         invalid={(errors.isActive && touched.isActive) as boolean}
         errorMessage={errors.isActive}
       >
-        <Field
-          type="text"
-          autoComplete="off"
-          name="isActive"
-          placeholder="true"
-          component={Input}
-        />
+        <Field name="isActive">
+          {({ field, form }: FieldProps) => (
+            <Switcher
+              checked={field.value}
+              checkedContent="Active"
+              unCheckedContent="Inactive"
+              onChange={(checked: boolean) =>
+                form.setFieldValue('isActive', !checked)
+              }
+            />
+          )}
+        </Field>
       </FormItem>
     </AdaptableCard>
   )
