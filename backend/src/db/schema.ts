@@ -62,6 +62,7 @@ export const pipelines = pgTable("pipelines", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  description: text("description"),
   sourceUrl: text("source_url").unique().notNull(),
   actionType: text("action_type").notNull(), // e.g. 'transform', 'filter', 'enrich', 'webhook-forward'
   actionConfig: jsonb("action_config").notNull().default("{}"),

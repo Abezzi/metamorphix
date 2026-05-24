@@ -15,7 +15,8 @@ export const createPipelineHandler = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const user = req.user!;
 
-    const { name, actionType, actionConfig, subscribers } = req.body;
+    const { name, description, actionType, actionConfig, subscribers } =
+      req.body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       respondWithError(
@@ -48,6 +49,7 @@ export const createPipelineHandler = asyncHandler(
 
     const createData: CreatePipelineDto = {
       name: name.trim(),
+      description: description || "",
       actionType: actionType as any,
       actionConfig: actionConfig || {},
       subscribers: subscribers || [],
@@ -127,7 +129,7 @@ export const getPipelineByIdHandler = asyncHandler(
 export const updatePipelineHandler = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, actionType, actionConfig, isActive } = req.body;
+    const { name, description, actionType, actionConfig, isActive } = req.body;
 
     if (!id || typeof id !== "string") {
       respondWithError(res, 400, "Valid pipeline ID is required");
