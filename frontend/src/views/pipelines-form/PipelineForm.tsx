@@ -1,126 +1,199 @@
-import { forwardRef } from 'react'
-import Tabs from '@/components/ui/Tabs'
+import { forwardRef, useState } from 'react'
 import { FormContainer } from '@/components/ui/Form'
+import Button from '@/components/ui/Button'
+import hooks from '@/components/ui/hooks'
+import StickyFooter from '@/components/shared/StickyFooter'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 import { Form, Formik, FormikProps } from 'formik'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import BasicInformationFields from './BasicInformationFields'
+// import PricingFields from './PricingFields'
+// import OrganizationFields from './OrganizationFields'
+// import PipelineImages from './PipelineImages'
+import cloneDeep from 'lodash/cloneDeep'
+import { HiOutlineTrash } from 'react-icons/hi'
+import { AiOutlineSave } from 'react-icons/ai'
 import * as Yup from 'yup'
-import PersonalInfoForm from './PersonalInfoForm'
-import SocialLinkForm from './SocialLinkForm'
 
-type BasePipelineInfo = {
-  name: string
-  email: string
-  img: string
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+type FormikRef = FormikProps<any>
+
+type InitialData = {
+  id?: string
+  name?: string
+  description?: string
+  actionType?: string
+  actionConfig?: string
+  boolean?: boolean
 }
 
-type PipelinePersonalInfo = {
-  location: string
-  title: string
-  phoneNumber: string
-  birthday: string
-  facebook: string
-  twitter: string
-  pinterest: string
-  linkedIn: string
+export type FormModel = Omit<InitialData, 'tags'> & {
+  tags: { label: string; value: string }[] | string[]
 }
 
-export type Pipeline = BasePipelineInfo & PipelinePersonalInfo
+export type SetSubmitting = (isSubmitting: boolean) => void
 
-export interface FormModel extends Omit<Pipeline, 'birthday'> {
-  birthday: Date
+export type OnDeleteCallback = React.Dispatch<React.SetStateAction<boolean>>
+
+type OnDelete = (callback: OnDeleteCallback) => void
+
+type PipelineForm = {
+  initialData?: InitialData
+  type: 'edit' | 'new'
+  onDiscard?: () => void
+  onDelete?: OnDelete
+  onFormSubmit: (formData: FormModel, setSubmitting: SetSubmitting) => void
 }
 
-export type FormikRef = FormikProps<FormModel>
-
-export type PipelineProps = Partial<
-  BasePipelineInfo & { personalInfo: PipelinePersonalInfo }
->
-
-type PipelineFormProps = {
-  pipeline: PipelineProps
-  onFormSubmit: (values: FormModel) => void
-}
-
-dayjs.extend(customParseFormat)
+const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Email Required'),
-  name: Yup.string().required('User Name Required'),
-  location: Yup.string(),
-  title: Yup.string(),
-  phoneNumber: Yup.string().matches(
-    /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/,
-    'Phone number is not valid',
-  ),
-  birthday: Yup.string(),
-  facebook: Yup.string(),
-  twitter: Yup.string(),
-  pinterest: Yup.string(),
-  linkedIn: Yup.string(),
-  img: Yup.string(),
+  name: Yup.string().required('Pipeline Name Required'),
 })
 
-const { TabNav, TabList, TabContent } = Tabs
+const DeletePipelineButton = ({ onDelete }: { onDelete: OnDelete }) => {
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-const PipelineForm = forwardRef<FormikRef, PipelineFormProps>((props, ref) => {
-  const { pipeline, onFormSubmit } = props
+  const onConfirmDialogOpen = () => {
+    setDialogOpen(true)
+  }
+
+  const onConfirmDialogClose = () => {
+    setDialogOpen(false)
+  }
+
+  const handleConfirm = () => {
+    onDelete?.(setDialogOpen)
+  }
 
   return (
-    <Formik<FormModel>
-      innerRef={ref}
-      initialValues={{
-        name: pipeline.name || '',
-        email: pipeline.email || '',
-        img: pipeline.img || '',
-        location: pipeline?.personalInfo?.location || '',
-        title: pipeline?.personalInfo?.title || '',
-        phoneNumber: pipeline?.personalInfo?.phoneNumber || '',
-        birthday: (pipeline?.personalInfo?.birthday &&
-          dayjs(
-            pipeline.personalInfo.birthday,
-            'DD/MM/YYYY',
-          ).toDate()) as Date,
-        facebook: pipeline?.personalInfo?.facebook || '',
-        twitter: pipeline?.personalInfo?.twitter || '',
-        pinterest: pipeline?.personalInfo?.pinterest || '',
-        linkedIn: pipeline?.personalInfo?.linkedIn || '',
-      }}
-      validationSchema={validationSchema}
-      onSubmit={(values, { setSubmitting }) => {
-        onFormSubmit?.(values)
-        setSubmitting(false)
-      }}
-    >
-      {({ touched, errors }) => (
-        <Form>
-          <FormContainer>
-            <Tabs defaultValue="personalInfo">
-              <TabList>
-                <TabNav value="personalInfo">
-                  Personal Info
-                </TabNav>
-                <TabNav value="social">Social</TabNav>
-              </TabList>
-              <div className="p-6">
-                <TabContent value="personalInfo">
-                  <PersonalInfoForm
+    <>
+      <Button
+        className="text-red-600"
+        variant="plain"
+        size="sm"
+        icon={<HiOutlineTrash />}
+        type="button"
+        onClick={onConfirmDialogOpen}
+      >
+        Delete
+      </Button>
+      <ConfirmDialog
+        isOpen={dialogOpen}
+        type="danger"
+        title="Delete pipeline"
+        confirmButtonColor="red-600"
+        onClose={onConfirmDialogClose}
+        onRequestClose={onConfirmDialogClose}
+        onCancel={onConfirmDialogClose}
+        onConfirm={handleConfirm}
+      >
+        <p>
+          Are you sure you want to delete this pipeline? All record
+          related to this pipeline will be deleted as well. This
+          action cannot be undone.
+        </p>
+      </ConfirmDialog>
+    </>
+  )
+}
+
+const PipelineForm = forwardRef<FormikRef, PipelineForm>((props, ref) => {
+  const {
+    type,
+    initialData = {
+      id: '',
+      name: '',
+      description: '',
+      actionType: '',
+      actionConfig: '',
+      boolean: false,
+    },
+    onFormSubmit,
+    onDiscard,
+    onDelete,
+  } = props
+
+  const newId = useUniqueId('pipeline-')
+
+  return (
+    <>
+      <Formik
+        innerRef={ref}
+        initialValues={{
+          ...initialData,
+        }}
+        validationSchema={validationSchema}
+        onSubmit={(values: FormModel, { setSubmitting }) => {
+          const formData = cloneDeep(values)
+          if (type === 'new') {
+            formData.id = newId
+          }
+          onFormSubmit?.(formData, setSubmitting)
+        }}
+      >
+        {({ values, touched, errors, isSubmitting }) => (
+          <Form>
+            <FormContainer>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <BasicInformationFields
                     touched={touched}
                     errors={errors}
                   />
-                </TabContent>
-                <TabContent value="social">
-                  <SocialLinkForm
+                  {/*
+                  <PricingFields
                     touched={touched}
                     errors={errors}
                   />
-                </TabContent>
+                  <OrganizationFields
+                    touched={touched}
+                    errors={errors}
+                    values={values}
+                  />
+                */}
+                </div>
+                {/*
+                <div className="lg:col-span-1">
+                  <PipelineImages values={values} />
+                </div>
+                */}
               </div>
-            </Tabs>
-          </FormContainer>
-        </Form>
-      )}
-    </Formik>
+              <StickyFooter
+                className="-mx-8 px-8 flex items-center justify-between py-4"
+                stickyClass="border-t bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+              >
+                <div>
+                  {type === 'edit' && (
+                    <DeletePipelineButton
+                      onDelete={onDelete as OnDelete}
+                    />
+                  )}
+                </div>
+                <div className="md:flex items-center">
+                  <Button
+                    size="sm"
+                    className="ltr:mr-3 rtl:ml-3"
+                    type="button"
+                    onClick={() => onDiscard?.()}
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="solid"
+                    loading={isSubmitting}
+                    icon={<AiOutlineSave />}
+                    type="submit"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </StickyFooter>
+            </FormContainer>
+          </Form>
+        )}
+      </Formik>
+    </>
   )
 })
 

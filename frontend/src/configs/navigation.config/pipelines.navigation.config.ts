@@ -14,7 +14,7 @@ const pipelineNavigationConfig: NavigationTree[] = [
     subMenu: [
       {
         key: 'pipelines.allPipelines',
-        path: `${PIPELINES_PREFIX_PATH}/all-pipelines`,
+        path: `${PIPELINES_PREFIX_PATH}/list`,
         title: 'All Pipelines',
         translateKey: 'nav.pipelines.allPipelines',
         icon: 'pipelines',

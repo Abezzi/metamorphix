@@ -11,6 +11,7 @@ import PipelineTableSearch from './PipelineTableSearch'
 import PipelineTableFilter from './PipelineTableFilter'
 import cloneDeep from 'lodash/cloneDeep'
 import type { TableQueries } from '@/@types/common'
+import { Link } from 'react-router-dom'
 
 const PipelinesTableTools = () => {
   const dispatch = useAppDispatch()
@@ -70,9 +71,14 @@ const PipelinesTableTools = () => {
       </div>
 
       <div className="md:flex items-center gap-4 pb-4">
-        <Button size="sm" variant="solid" onClick={onCreate}>
-          Create Pipeline
-        </Button>
+        <Link
+          className="block lg:inline-block md:mb-0 mb-4"
+          to="/pipelines/new"
+        >
+          <Button size="sm" variant="solid" onClick={onCreate}>
+            Create Pipeline
+          </Button>
+        </Link>
       </div>
     </div>
   )

@@ -24,6 +24,16 @@ export async function apiGetPipelines<T, U extends Record<string, unknown>>(
   })
 }
 
+export async function apiCreatePipeline<T, U extends Record<string, unknown>>(
+  data: U,
+) {
+  return ApiService.fetchData<T>({
+    url: '/pipelines',
+    method: 'post',
+    data,
+  })
+}
+
 export async function apiGetPipelinesStatistic<T>() {
   return ApiService.fetchData<T>({
     url: '/pipelines/pipelines-statistic',
@@ -59,25 +69,5 @@ export async function apiDeletePipeline<T, U extends Record<string, unknown>>(
     url: '/crm/pipeline/delete',
     method: 'delete',
     data,
-  })
-}
-
-export async function apiGetMails<T, U extends Record<string, unknown>>(
-  params: U,
-) {
-  return ApiService.fetchData<T>({
-    url: '/crm/mails',
-    method: 'get',
-    params,
-  })
-}
-
-export async function apiGetMail<T, U extends Record<string, unknown>>(
-  params: U,
-) {
-  return ApiService.fetchData<T>({
-    url: '/crm/mail',
-    method: 'get',
-    params,
   })
 }
