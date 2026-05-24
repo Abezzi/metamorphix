@@ -66,9 +66,39 @@ export const createPipelineHandler = asyncHandler(
 
 // get all
 export const getAllPipelinesHandler = asyncHandler(
-  async (_req: Request, res: Response) => {
-    const pipelines = await service.getAll();
-    respondWithJSON(res, 200, pipelines);
+  async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
+
+    const {
+      pageIndex = 1,
+      pageSize = 10,
+      sort = "createdAt",
+      order = "desc",
+      query = "",
+      filterData,
+    } = req.query;
+
+    const page = Number(pageIndex);
+    const limit = Number(pageSize);
+    const offset = (page - 1) * limit;
+
+    const { data, total } = await service.getAllPipelines({
+      page,
+      limit,
+      offset,
+      sort: String(sort),
+      order: order === "asc" ? "asc" : "desc",
+      search: String(query),
+      filterData: filterData ? JSON.parse(String(filterData)) : undefined,
+      userId: user.id,
+    });
+
+    respondWithJSON(res, 200, {
+      // Pipeline[] in frontend
+      data,
+      // number (total count before pagination)
+      total,
+    });
   },
 );
 
@@ -146,5 +176,19 @@ export const deletePipelineHandler = asyncHandler(
     await service.delete(id);
     // no content
     respondWithJSON(res, 204, null);
+  },
+);
+
+export const getPipelinesStatisticHandler = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
+
+    try {
+      const statistics = await service.getPipelinesStatistic(user.id);
+      respondWithJSON(res, 200, statistics);
+    } catch (error) {
+      console.error("Error fetching pipelines statistics:", error);
+      respondWithJSON(res, 500, { message: "Failed to fetch statistics" });
+    }
   },
 );
