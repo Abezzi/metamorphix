@@ -33,9 +33,9 @@ const Side = ({ children, content, ...rest }: SideProps) => {
                         </div>
                     </div>
                     <p className="text-lg text-white opacity-80">
-                        Elstar comes with a complete set of UI components
-                        crafted with Tailwind CSS, it fulfilled most of the use
-                        case to create modern and beautiful UI and application
+                        Metamorphix is a mini automation platform that comes
+                        with features to process your data and transform it
+                        using various webhooks
                     </p>
                 </div>
                 <span className="text-white">
@@ -48,8 +48,8 @@ const Side = ({ children, content, ...rest }: SideProps) => {
                     <div className="mb-8">{content}</div>
                     {children
                         ? cloneElement(children as React.ReactElement, {
-                              ...rest,
-                          })
+                            ...rest,
+                        })
                         : null}
                 </div>
             </div>
