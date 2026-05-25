@@ -146,7 +146,8 @@ export const updatePipelineHandler = asyncHandler(
       !name &&
       !actionType &&
       actionConfig === undefined &&
-      isActive === undefined
+      isActive === undefined &&
+      !description
     ) {
       respondWithError(res, 400, "At least one field to update is required");
       return;
@@ -159,6 +160,7 @@ export const updatePipelineHandler = asyncHandler(
     if (actionType !== undefined) updateData.actionType = actionType;
     if (actionConfig !== undefined) updateData.actionConfig = actionConfig;
     if (isActive !== undefined) updateData.isActive = isActive;
+    if (description !== undefined) updateData.description = description;
 
     const pipeline = await service.update(id, updateData);
 

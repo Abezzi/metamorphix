@@ -5,32 +5,47 @@ import {
   getPipelines,
   setTableData,
   setSelectedPipeline,
-  setDrawerOpen,
   useAppDispatch,
   useAppSelector,
+  toggleDeleteConfirmation,
   Pipeline,
 } from '../store'
 import useThemeClass from '@/utils/hooks/useThemeClass'
-import PipelineEditDialog from './PipelineEditDialog'
 import dayjs from 'dayjs'
 import cloneDeep from 'lodash/cloneDeep'
 import type { OnSortParam, ColumnDef } from '@/components/shared/DataTable'
+import { useNavigate } from 'react-router-dom'
+import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
+import PipelineDeleteConfirmation from './PipelineDeleteConfirmation'
 
 const ActionColumn = ({ row }: { row: Pipeline }) => {
   const { textTheme } = useThemeClass()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const onEdit = () => {
-    dispatch(setDrawerOpen())
-    dispatch(setSelectedPipeline(row))
+    navigate(`/pipelines/pipeline-edit/${row.id}`)
+  }
+
+  const onDelete = () => {
+    dispatch(toggleDeleteConfirmation(true))
+    dispatch(setSelectedPipeline(row.id))
   }
 
   return (
-    <div
-      className={`${textTheme} cursor-pointer select-none font-semibold`}
-      onClick={onEdit}
-    >
-      Edit
+    <div className="flex justify-end text-lg">
+      <span
+        className={`cursor-pointer p-2 hover:${textTheme}`}
+        onClick={onEdit}
+      >
+        <HiOutlinePencil />
+      </span>
+      <span
+        className="cursor-pointer p-2 hover:text-red-500"
+        onClick={onDelete}
+      >
+        <HiOutlineTrash />
+      </span>
     </div>
   )
 }
@@ -164,7 +179,7 @@ const AllPipelines = () => {
         onSelectChange={onSelectChange}
         onSort={onSort}
       />
-      <PipelineEditDialog />
+      <PipelineDeleteConfirmation />
     </>
   )
 }

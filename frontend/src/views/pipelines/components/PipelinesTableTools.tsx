@@ -50,10 +50,6 @@ const PipelinesTableTools = () => {
     fetchData(newTableData)
   }
 
-  const onCreate = () => {
-    console.log('creating a pipeline')
-  }
-
   return (
     <div className="md:flex items-center justify-between">
       <div className="md:flex items-center gap-4">
@@ -75,7 +71,7 @@ const PipelinesTableTools = () => {
           className="block lg:inline-block md:mb-0 mb-4"
           to="/pipelines/new"
         >
-          <Button size="sm" variant="solid" onClick={onCreate}>
+          <Button size="sm" variant="solid">
             Create Pipeline
           </Button>
         </Link>

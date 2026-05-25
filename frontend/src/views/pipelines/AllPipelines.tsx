@@ -10,7 +10,7 @@ injectReducer('crmPipelines', reducer)
 const AllPipelines = () => {
   return (
     <>
-      <h1>All Pipelines</h1>
+      <h3>All Pipelines</h3>
       <PipelineStatistic />
       <AdaptableCard className="h-full" bodyClass="h-full">
         <PipelinesTableTools />

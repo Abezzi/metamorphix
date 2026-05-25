@@ -66,8 +66,7 @@ export async function apiDeletePipeline<T, U extends Record<string, unknown>>(
   data: U,
 ) {
   return ApiService.fetchData<T>({
-    url: '/crm/pipeline/delete',
+    url: `/pipelines/${data.id}`,
     method: 'delete',
-    data,
   })
 }

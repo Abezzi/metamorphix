@@ -3,6 +3,7 @@ import {
   apiGetPipelines,
   apiPutPipeline,
   apiGetPipelinesStatistic,
+  apiDeletePipeline,
 } from '@/services/PipelineService'
 import type { TableQueries } from '@/@types/common'
 
@@ -47,8 +48,8 @@ export type PipelinesState = {
   statisticData: Partial<PipelineStatistic>
   tableData: TableQueries
   filterData: Filter
-  drawerOpen: boolean
-  selectedPipeline: Partial<Pipeline>
+  selectedPipeline: string
+  deleteConfirmation: boolean
 }
 
 export const SLICE_NAME = 'crmPipelines'
@@ -81,6 +82,14 @@ export const putPipeline = createAsyncThunk(
   },
 )
 
+export const deletePipeline = async (data: { id: string | string[] }) => {
+  const response = await apiDeletePipeline<
+    boolean,
+    { id: string | string[] }
+  >(data)
+  return response.data
+}
+
 export const initialTableData: TableQueries = {
   total: 0,
   pageIndex: 1,
@@ -103,8 +112,8 @@ const initialState: PipelinesState = {
   statisticData: {},
   tableData: initialTableData,
   filterData: initialFilterData,
-  drawerOpen: false,
-  selectedPipeline: {},
+  deleteConfirmation: false,
+  selectedPipeline: '',
 }
 
 const pipelinesSlice = createSlice({
@@ -123,11 +132,8 @@ const pipelinesSlice = createSlice({
     setSelectedPipeline: (state, action) => {
       state.selectedPipeline = action.payload
     },
-    setDrawerOpen: (state) => {
-      state.drawerOpen = true
-    },
-    setDrawerClose: (state) => {
-      state.drawerOpen = false
+    toggleDeleteConfirmation: (state, action) => {
+      state.deleteConfirmation = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -155,8 +161,7 @@ export const {
   setPipelineList,
   setFilterData,
   setSelectedPipeline,
-  setDrawerOpen,
-  setDrawerClose,
+  toggleDeleteConfirmation,
 } = pipelinesSlice.actions
 
 export default pipelinesSlice.reducer
