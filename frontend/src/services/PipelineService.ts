@@ -7,18 +7,21 @@ export async function apiGetDashboardData<T>() {
   })
 }
 
-export async function apiGetCalendar<T>() {
-  return ApiService.fetchData<T>({
-    url: '/pipelines/calendar',
-    method: 'get',
-  })
-}
-
 export async function apiGetPipelines<T, U extends Record<string, unknown>>(
   params: U,
 ) {
   return ApiService.fetchData<T>({
     url: '/pipelines',
+    method: 'get',
+    params,
+  })
+}
+
+export async function apiGetPipeline<T, U extends Record<string, unknown>>(
+  params: U,
+) {
+  return ApiService.fetchData<T>({
+    url: `/pipelines/${params.id}`,
     method: 'get',
     params,
   })
@@ -45,8 +48,8 @@ export async function apiPutPipeline<T, U extends Record<string, unknown>>(
   data: U,
 ) {
   return ApiService.fetchData<T>({
-    url: '/pipelines',
-    method: 'put',
+    url: `/pipelines/${data.id}`,
+    method: 'patch',
     data,
   })
 }

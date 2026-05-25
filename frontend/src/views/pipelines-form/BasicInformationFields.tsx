@@ -76,6 +76,7 @@ const BasicInformationFields = (props: BasicInformationFields) => {
         errorMessage={errors.actionConfig}
       >
         <Field
+          textArea
           type="text"
           autoComplete="off"
           name="actionConfig"

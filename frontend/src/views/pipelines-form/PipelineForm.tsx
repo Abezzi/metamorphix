@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef, useMemo, useState } from 'react'
 import { FormContainer } from '@/components/ui/Form'
 import Button from '@/components/ui/Button'
 import hooks from '@/components/ui/hooks'
@@ -22,12 +22,17 @@ type InitialData = {
   name?: string
   description?: string
   actionType?: string
-  actionConfig?: string
+  actionConfig?: any
   isActive?: boolean
 }
 
-export type FormModel = Omit<InitialData, 'tags'> & {
-  tags: { label: string; value: string }[] | string[]
+export type FormModel = {
+  id?: string
+  name: string
+  description: string
+  actionType: string
+  actionConfig: object
+  isActive: boolean
 }
 
 export type SetSubmitting = (isSubmitting: boolean) => void
@@ -48,6 +53,19 @@ const { useUniqueId } = hooks
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Pipeline Name Required'),
+  actionConfig: Yup.string().test(
+    'valid-json',
+    'Action Config must be valid JSON',
+    (value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    },
+  ),
 })
 
 const DeletePipelineButton = ({ onDelete }: { onDelete: OnDelete }) => {
@@ -105,7 +123,7 @@ const PipelineForm = forwardRef<FormikRef, PipelineForm>((props, ref) => {
       name: '',
       description: '',
       actionType: '',
-      actionConfig: '',
+      actionConfig: '{}',
       isActive: false,
     },
     onFormSubmit,
@@ -115,21 +133,63 @@ const PipelineForm = forwardRef<FormikRef, PipelineForm>((props, ref) => {
 
   const newId = useUniqueId('pipeline-')
 
+  // converts actionConfig from object to string for the form
+  const initialValues = useMemo(() => {
+    const data = cloneDeep(initialData)
+
+    let actionConfigString = '{}'
+
+    if (data.actionConfig) {
+      if (typeof data.actionConfig === 'object') {
+        actionConfigString = JSON.stringify(data.actionConfig, null, 2)
+      } else if (typeof data.actionConfig === 'string') {
+        actionConfigString = data.actionConfig
+      }
+    }
+
+    return {
+      ...data,
+      actionConfig: actionConfigString,
+    }
+  }, [initialData])
+
+  const handleSubmit = (values: any, { setSubmitting }: any) => {
+    const formData = cloneDeep(values)
+
+    // transform actionConfig string to object before sending to backend
+    let actionConfigObject = {}
+
+    try {
+      if (formData.actionConfig?.trim()) {
+        actionConfigObject = JSON.parse(formData.actionConfig)
+      }
+    } catch (error) {
+      // this should rarely happen due to Yup validation, but just in case
+      alert('Invalid JSON in Action Config')
+      setSubmitting(false)
+      return
+    }
+
+    const payload: FormModel = {
+      ...formData,
+      actionConfig: actionConfigObject,
+    }
+
+    if (type === 'new') {
+      payload.id = newId
+    }
+
+    onFormSubmit(payload, setSubmitting)
+  }
+
   return (
     <>
       <Formik
         innerRef={ref}
-        initialValues={{
-          ...initialData,
-        }}
+        initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values: FormModel, { setSubmitting }) => {
-          const formData = cloneDeep(values)
-          if (type === 'new') {
-            formData.id = newId
-          }
-          onFormSubmit?.(formData, setSubmitting)
-        }}
+        onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
         {({ values, touched, errors, isSubmitting }) => (
           <Form>

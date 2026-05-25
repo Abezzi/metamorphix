@@ -4,7 +4,7 @@ import type { Routes } from '@/@types/routes'
 import { PIPELINES_PREFIX_PATH } from '@/constants/route.constant'
 
 const pipelinesRoute: Routes = [
-  // table
+  // get pipelines (read)
   {
     key: 'pipelines.allPipelines',
     path: `${PIPELINES_PREFIX_PATH}/list`,
@@ -21,16 +21,16 @@ const pipelinesRoute: Routes = [
       header: 'Add New Pipeline',
     },
   },
-  // update pipeline
-  // {
-  //   key: 'pipelines.edit',
-  //   path: `${PIPELINES_PREFIX_PATH}/edit/:pipelineId`,
-  //   component: lazy(() => import('@/views/pipelines-edit/PipelineEdit')),
-  //   authority: [ADMIN, USER],
-  //   meta: {
-  //     header: 'Edit Pipeline',
-  //   },
-  // },
+  // edit pipeline (update)
+  {
+    key: 'pipelines.edit',
+    path: `${PIPELINES_PREFIX_PATH}/edit/:pipelineId`,
+    component: lazy(() => import('@/views/pipelines-edit/PipelineEdit')),
+    authority: [ADMIN, USER],
+    meta: {
+      header: 'Edit Pipeline',
+    },
+  },
 ]
 
 export default pipelinesRoute

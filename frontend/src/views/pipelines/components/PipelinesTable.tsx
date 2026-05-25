@@ -24,7 +24,7 @@ const ActionColumn = ({ row }: { row: Pipeline }) => {
   const navigate = useNavigate()
 
   const onEdit = () => {
-    navigate(`/pipelines/pipeline-edit/${row.id}`)
+    navigate(`/pipelines/edit/${row.id}`)
   }
 
   const onDelete = () => {
