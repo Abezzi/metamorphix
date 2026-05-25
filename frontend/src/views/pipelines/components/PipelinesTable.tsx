@@ -129,7 +129,7 @@ const AllPipelines = () => {
           const row = props.row.original
           return (
             <div className="flex items-center">
-              {dayjs(row.createdAt).format('MM/DD/YYYY')}
+              {dayjs(row.updatedAt).format('MM/DD/YYYY')}
             </div>
           )
         },
