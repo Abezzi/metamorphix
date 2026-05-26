@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsx",
+    "build": "tsc",
     "start": "node dist/index.js",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "dev": "npx tsc && node dist/index.js",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "worker": "tsx src/worker.ts",
+    "dev:worker": "tsx src/worker.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +19,7 @@
   "type": "module",
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.0",
     "@vitest/coverage-v8": "^4.1.6",
@@ -28,8 +31,10 @@
   },
   "dependencies": {
     "argon2": "^0.44.0",
+    "bullmq": "^5.77.3",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
+    "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "postgres": "^3.4.9"
   },
