@@ -12,13 +12,28 @@ import healthRouter from "./routes/health.js";
 import authRouter from "./routes/auth.js";
 import pipelineRouter from "./routes/pipeline.js";
 import userRouter from "./routes/users.js";
+import webhookRouter from "./routes/webhook.js";
 
 const app = express();
-const PORT = 8080;
+const PORT = 3000;
 
 // database migration
-const migrationClient = postgres(dbConfig.url, { max: 1 });
-await migrate(drizzle(migrationClient), dbConfig.migrationConfig);
+const runMigration = async () => {
+  console.log("🔄 Running database migrations...");
+  const migrationClient = postgres(dbConfig.url, { max: 1 });
+  try {
+    await migrate(drizzle(migrationClient), dbConfig.migrationConfig);
+    console.log("✅ Migrations completed successfully");
+  } catch (error) {
+    console.error("❌ Migration failed:", error);
+    // Don't crash the server on migration error in production
+  } finally {
+    await migrationClient.end();
+  }
+};
+
+// run migration once at startup
+await runMigration();
 
 // middlewares
 // use the middleware handler to log non-ok responses
@@ -32,6 +47,7 @@ apiRouter.use(healthRouter);
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/pipelines", pipelineRouter);
 apiRouter.use("/users", userRouter);
+apiRouter.use("/webhooks", webhookRouter);
 
 // mount the main api router
 app.use("/api", apiRouter);
@@ -44,7 +60,7 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
   console.log(`📡 API available at http://localhost:${PORT}/api`);
 });
