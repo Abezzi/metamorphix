@@ -25,3 +25,23 @@
 ![Backend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/backend-ci.yml/badge.svg)
 
 ![Frontend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/frontend-ci.yml/badge.svg)
+
+# Pre Requisites
+
+- Docker
+- Docker Compose plugin
+
+# Installation
+
+clone the repository
+
+```bash
+git clone https://github.com/Abezzi/metamorphix.git
+cd metamorphix
+```
+
+run docker
+
+```bash
+docker-compose up -d --build
+```
