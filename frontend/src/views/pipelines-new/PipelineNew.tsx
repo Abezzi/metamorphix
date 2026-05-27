@@ -25,11 +25,11 @@ const PipelineNew = () => {
     if (success) {
       toast.push(
         <Notification
-          title={'Successfuly added'}
+          title={'Successfully added'}
           type="success"
           duration={2500}
         >
-          Pipeline successfuly added
+          Pipeline successfully added
         </Notification>,
         {
           placement: 'top-center',
