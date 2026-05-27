@@ -34,7 +34,7 @@ export class PipelineService {
       .values({
         name: data.name,
         description: data.description,
-        sourceUrl: `/webhooks/${crypto.randomUUID()}`,
+        sourceUrl: crypto.randomUUID(),
         actionType: data.actionType,
         actionConfig: data.actionConfig || {},
         isActive: data.isActive || false,
