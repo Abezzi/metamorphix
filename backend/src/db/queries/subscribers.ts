@@ -23,7 +23,7 @@ export class SubscriberService {
     const { page, limit, offset, sort, order, search, filterData, userId } =
       params;
 
-    // Build base conditions
+    // build where conditions
     const whereConditions: any[] = [
       eq(pipelines.userId, userId),
       eq(subscribers.pipelineId, pipelines.id),
@@ -77,7 +77,7 @@ export class SubscriberService {
       offset,
     });
 
-    // Count query - more reliable with explicit join
+    // total count for pagination
     const [{ total }] = await db
       .select({ total: count() })
       .from(subscribers)
