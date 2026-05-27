@@ -5,3 +5,7 @@
 ### backend connection from frontend
 
 edit the frontend/vite.config.ts file in the target url
+
+### future improvements:
+
+- allow custom-slugs for source url in the pipeline CRUD
