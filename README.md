@@ -45,3 +45,14 @@ run docker
 ```bash
 docker-compose up -d --build
 ```
+
+### If migrations don't work
+
+you probably deleted the migrations folder or the schema doesn't exist
+
+```bash
+docker-compose up -d --build
+docker docker compose exec postgres psql -U postgres -d metamorphix
+# inside metamorphix psql
+CREATE SCHEMA drizzle;
+```
