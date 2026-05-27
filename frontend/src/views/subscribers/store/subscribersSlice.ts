@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { apiGetSubscribers } from '@/services/SubscriberService'
+import {
+  apiDeleteSubscriber,
+  apiGetSubscribers,
+  apiGetSubscribersStatistic,
+  apiPutSubscriber,
+} from '@/services/SubscriberService'
 import type { TableQueries } from '@/@types/common'
 
 export type Subscriber = {
@@ -31,7 +36,7 @@ type GetSubscribersResponse = {
   total: number
 }
 
-// type GetSubscribersStatisticResponse = SubscriberStatistic
+type GetSubscribersStatisticResponse = SubscriberStatistic
 
 export type SubscribersState = {
   loading: boolean
@@ -46,14 +51,14 @@ export type SubscribersState = {
 
 export const SLICE_NAME = 'subscribers'
 
-// export const getSubscriberStatistic = createAsyncThunk(
-//   'subscribers/data/getSubscriberStatistic',
-//   async () => {
-//     const response =
-//       await apiGetSubscribersStatistic<GetSubscribersStatisticResponse>()
-//     return response.data
-//   },
-// )
+export const getSubscriberStatistic = createAsyncThunk(
+  'subscribers/data/getSubscriberStatistic',
+  async () => {
+    const response =
+      await apiGetSubscribersStatistic<GetSubscribersStatisticResponse>()
+    return response.data
+  },
+)
 
 export const getSubscribers = createAsyncThunk(
   'subscribers/data/getSubscribers',
@@ -66,21 +71,21 @@ export const getSubscribers = createAsyncThunk(
   },
 )
 
-// export const putSubscriber = createAsyncThunk(
-//   'subscribers/data/putSubscriber',
-//   async (data: Subscriber) => {
-//     const response = await apiPutSubscriber(data)
-//     return response.data
-//   },
-// )
+export const putSubscriber = createAsyncThunk(
+  'subscribers/data/putSubscriber',
+  async (data: Subscriber) => {
+    const response = await apiPutSubscriber(data)
+    return response.data
+  },
+)
 
-// export const deleteSubscriber = async (data: { id: string | string[] }) => {
-//   const response = await apiDeleteSubscriber<
-//     boolean,
-//     { id: string | string[] }
-//   >(data)
-//   return response.data
-// }
+export const deleteSubscriber = async (data: { id: string | string[] }) => {
+  const response = await apiDeleteSubscriber<
+    boolean,
+    { id: string | string[] }
+  >(data)
+  return response.data
+}
 
 export const initialTableData: TableQueries = {
   total: 0,
@@ -138,13 +143,13 @@ const subscribersSlice = createSlice({
       .addCase(getSubscribers.pending, (state) => {
         state.loading = true
       })
-    // .addCase(getSubscriberStatistic.fulfilled, (state, action) => {
-    //   state.statisticData = action.payload
-    //   state.statisticLoading = false
-    // })
-    // .addCase(getSubscriberStatistic.pending, (state) => {
-    //   state.statisticLoading = true
-    // })
+      .addCase(getSubscriberStatistic.fulfilled, (state, action) => {
+        state.statisticData = action.payload
+        state.statisticLoading = false
+      })
+      .addCase(getSubscriberStatistic.pending, (state) => {
+        state.statisticLoading = true
+      })
   },
 })
 

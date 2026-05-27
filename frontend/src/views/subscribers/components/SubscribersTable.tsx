@@ -15,7 +15,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import type { OnSortParam, ColumnDef } from '@/components/shared/DataTable'
 import { useNavigate } from 'react-router-dom'
 import { HiOutlinePencil, HiOutlineTrash } from 'react-icons/hi'
-// import SubscriberDeleteConfirmation from './SubscriberDeleteConfirmation'
+import SubscriberDeleteConfirmation from './SubscriberDeleteConfirmation'
 
 const ActionColumn = ({ row }: { row: Subscriber }) => {
   const { textTheme } = useThemeClass()
@@ -143,11 +143,11 @@ const AllSubscribers = () => {
           )
         },
       },
-      // {
-      //   header: '',
-      //   id: 'action',
-      //   cell: (props) => <ActionColumn row={props.row.original} />,
-      // },
+      {
+        header: '',
+        id: 'action',
+        cell: (props) => <ActionColumn row={props.row.original} />,
+      },
     ],
     [],
   )
@@ -188,6 +188,7 @@ const AllSubscribers = () => {
         onSelectChange={onSelectChange}
         onSort={onSort}
       />
+      <SubscriberDeleteConfirmation />
     </>
   )
 }

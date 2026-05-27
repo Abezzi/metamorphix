@@ -11,6 +11,28 @@ const subscribersRoute: Routes = [
     component: lazy(() => import('@/views/subscribers/AllSubscribers')),
     authority: [ADMIN, USER],
   },
+  // new subscriber (create)
+  {
+    key: 'subscribers.new',
+    path: `${SUBSCRIBERS_PREFIX_PATH}/new`,
+    component: lazy(() => import('@/views/subscribers-new/SubscriberNew')),
+    authority: [ADMIN, USER],
+    meta: {
+      header: 'Add New Subscriber',
+    },
+  },
+  // edit subscriber (update)
+  {
+    key: 'subscribers.edit',
+    path: `${SUBSCRIBERS_PREFIX_PATH}/edit/:pipelineId`,
+    component: lazy(
+      () => import('@/views/subscribers-edit/SubscriberEdit'),
+    ),
+    authority: [ADMIN, USER],
+    meta: {
+      header: 'Edit Subscriber',
+    },
+  },
 ]
 
 export default subscribersRoute
