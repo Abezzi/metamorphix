@@ -13,6 +13,8 @@ import authRouter from "./routes/auth.js";
 import pipelineRouter from "./routes/pipeline.js";
 import userRouter from "./routes/users.js";
 import webhookRouter from "./routes/webhook.js";
+import jobsRouter from "./routes/jobs.js";
+import subscribersRouter from "./routes/subscriber.js";
 
 const app = express();
 const PORT = 3000;
@@ -48,6 +50,8 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/pipelines", pipelineRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/webhooks", webhookRouter);
+apiRouter.use("/jobs", jobsRouter);
+apiRouter.use("/subscribers", subscribersRouter);
 
 // mount the main api router
 app.use("/api", apiRouter);
