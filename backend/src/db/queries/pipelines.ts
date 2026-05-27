@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, gte, like, lt, or } from "drizzle-orm";
 import { db } from "../index.js";
-import { pipelines, subscribers } from "../schema.js";
+import { pipelines } from "../schema.js";
 import {
   CreatePipelineDto,
   UpdatePipelineDto,
@@ -42,23 +42,11 @@ export class PipelineService {
       })
       .returning();
 
-    if (data.subscribers && data.subscribers.length > 0) {
-      await db.insert(subscribers).values(
-        data.subscribers.map((sub) => ({
-          pipelineId: pipeline.id,
-          url: sub.url,
-          method: sub.method || "POST",
-          headers: sub.headers || {},
-        })),
-      );
-    }
-
     return this.getById(pipeline.id);
   }
 
   async getAll() {
     return db.query.pipelines.findMany({
-      with: { subscribers: true },
       orderBy: (p, { desc }) => [desc(p.createdAt)],
     });
   }
@@ -106,7 +94,6 @@ export class PipelineService {
     // main query with pagination, sorting and relations
     const data = await db.query.pipelines.findMany({
       where: whereClause,
-      with: { subscribers: true },
       orderBy: [
         order === "asc"
           ? asc(pipelines[finalSort as keyof typeof pipelines] as any)
@@ -131,7 +118,6 @@ export class PipelineService {
   async getById(id: string) {
     return db.query.pipelines.findFirst({
       where: eq(pipelines.id, id),
-      with: { subscribers: true },
     });
   }
 
@@ -151,7 +137,6 @@ export class PipelineService {
   async getBySourceUrl(sourceUrl: string) {
     return db.query.pipelines.findFirst({
       where: eq(pipelines.sourceUrl, sourceUrl),
-      with: { subscribers: true },
     });
   }
 

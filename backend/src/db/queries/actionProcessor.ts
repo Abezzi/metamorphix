@@ -254,10 +254,10 @@ export async function processPipelineJob(jobId: string, pipelineId: string) {
       .where(eq(jobs.id, jobId));
 
     // 5. Deliver to subscribers with retry logic
-    if (pipeline.subscribers && pipeline.subscribers.length > 0) {
+    if (pipeline.subscribersIds && pipeline.subscribersIds.length > 0) {
       await deliveryService.deliverWithRetry(
         jobId,
-        pipeline.subscribers,
+        pipeline.subscribersIds,
         finalPayload,
       );
     }

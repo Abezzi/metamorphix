@@ -1,6 +1,10 @@
 import { and, asc, count, desc, eq, exists, like, or } from "drizzle-orm";
 import { db } from "../index.js";
 import { pipelines, subscribers } from "../schema.js";
+import {
+  CreateSubscriberDto,
+  UpdateSubscriberDto,
+} from "../../types/subscriber.types.js";
 
 type Params = {
   page: number;
@@ -12,7 +16,31 @@ type Params = {
   filterData?: any;
 };
 
+type Statistic = {
+  value: number;
+  growShrink: number;
+};
+
+type SubscriberStatistic = {
+  totalPipelines: Statistic;
+  activePipelines: Statistic;
+  newPipelines: Statistic;
+};
+
 export class SubscriberService {
+  async create(data: CreateSubscriberDto, userId: string) {
+    const [subscriber] = await db
+      .insert(subscribers)
+      .values({
+        url: data.url,
+        method: data.method,
+        headers: data.headers || {},
+        userId,
+      })
+      .returning();
+
+    return this.getById(subscriber.id);
+  }
   async getAll() {
     return db.query.subscribers.findMany({
       orderBy: (p, { desc }) => [desc(p.createdAt)],
@@ -24,10 +52,7 @@ export class SubscriberService {
       params;
 
     // build where conditions
-    const whereConditions: any[] = [
-      eq(pipelines.userId, userId),
-      eq(subscribers.pipelineId, pipelines.id),
-    ];
+    const whereConditions: any[] = [eq(subscribers.userId, userId)];
 
     if (search) {
       whereConditions.push(
@@ -58,16 +83,7 @@ export class SubscriberService {
 
     // main query with pagination, sorting and relations
     const data = await db.query.subscribers.findMany({
-      where: exists(
-        db
-          .select({ id: pipelines.id })
-          .from(pipelines)
-          .where(eq(pipelines.id, subscribers.pipelineId)),
-      ),
-      with: {
-        // returns pipeline data too
-        pipeline: true,
-      },
+      where: whereClause,
       orderBy: [
         order === "asc"
           ? asc(subscribers[finalSort as keyof typeof subscribers] as any)
@@ -81,7 +97,6 @@ export class SubscriberService {
     const [{ total }] = await db
       .select({ total: count() })
       .from(subscribers)
-      .innerJoin(pipelines, eq(subscribers.pipelineId, pipelines.id))
       .where(whereClause);
 
     return {
@@ -94,5 +109,18 @@ export class SubscriberService {
     return db.query.subscribers.findFirst({
       where: eq(subscribers.id, id),
     });
+  }
+
+  async update(id: string, data: UpdateSubscriberDto) {
+    await db
+      .update(subscribers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(subscribers.id, id));
+
+    return this.getById(id);
+  }
+
+  async delete(id: string) {
+    await db.delete(subscribers).where(eq(subscribers.id, id));
   }
 }

@@ -1,6 +1,6 @@
 import { db } from "../index.js";
-import { jobs, pipelines } from "../schema.js";
-import { eq } from "drizzle-orm";
+import { jobs, pipelines, subscribers } from "../schema.js";
+import { eq, inArray } from "drizzle-orm";
 import { Queue } from "bullmq"; // we'll set this up next
 
 // Initialize BullMQ queue (we'll configure this properly soon)
@@ -51,9 +51,31 @@ export class JobService {
   }
 
   async getPipelineWithSubscribers(pipelineId: string) {
-    return db.query.pipelines.findFirst({
-      where: eq(pipelines.id, pipelineId),
-      with: { subscribers: true },
-    });
+    const result = await db
+      .select({
+        pipeline: pipelines,
+        subscriber: subscribers,
+      })
+      .from(pipelines)
+      .leftJoin(subscribers, inArray(subscribers.id, pipelines.subscribersIds))
+      .where(eq(pipelines.id, pipelineId));
+
+    if (result.length === 0) return null;
+
+    const pipeline = result[0].pipeline;
+
+    // group subscribers
+    const uniqueSubscribers = Array.from(
+      new Map(
+        result
+          .filter((r) => r.subscriber !== null)
+          .map((r) => [r.subscriber!.id, r.subscriber]),
+      ).values(),
+    );
+
+    return {
+      ...pipeline,
+      subscribers: uniqueSubscribers,
+    };
   }
 }

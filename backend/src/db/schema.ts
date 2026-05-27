@@ -70,21 +70,21 @@ export const pipelines = pgTable("pipelines", {
   actionType: text("action_type").notNull(),
   actionConfig: jsonb("action_config").notNull().default("{}"),
   isActive: boolean("is_active").default(true),
+  subscribersIds: uuid("subscribers_ids").array().notNull().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const subscribers = pgTable("subscribers", {
   id: uuid("id").primaryKey().defaultRandom(),
-  pipelineId: uuid("pipeline_id")
+  userId: uuid("user_id")
     .notNull()
-    .references(() => pipelines.id, {
-      onDelete: "cascade",
-    }),
+    .references(() => users.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   method: text("method").default("POST"),
   headers: jsonb("headers").default("{}"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // jobs and delivery
@@ -125,14 +125,14 @@ export const pipelinesRelations = relations(pipelines, ({ one, many }) => ({
     fields: [pipelines.userId],
     references: [users.id],
   }),
-  subscribers: many(subscribers),
   jobs: many(jobs),
+  // subscribers are an array so I don't define a direct relationship
 }));
 
 export const subscribersRelations = relations(subscribers, ({ one }) => ({
-  pipeline: one(pipelines, {
-    fields: [subscribers.pipelineId],
-    references: [pipelines.id],
+  users: one(users, {
+    fields: [subscribers.userId],
+    references: [users.id],
   }),
 }));
 
