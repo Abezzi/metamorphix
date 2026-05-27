@@ -14,7 +14,7 @@ const subscribersNavigationConfig: NavigationTree[] = [
     subMenu: [
       {
         key: 'subscribers.allSubscribers',
-        path: `${SUBSCRIBERS_PREFIX_PATH}/all-subscribers`,
+        path: `${SUBSCRIBERS_PREFIX_PATH}/list`,
         title: 'All Subscribers',
         translateKey: 'nav.subscribers.allSubscribers',
         icon: 'allSubscribers',

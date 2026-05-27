@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import authRoute from './authRoute'
 import type { Routes } from '@/@types/routes'
 import pipelinesRoute from './pipelinesRoute'
+import subscribersRoute from './subscribersRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -12,5 +13,6 @@ export const protectedRoutes = [
         component: lazy(() => import('@/views/Home')),
         authority: [],
     },
-    ...pipelinesRoute
+    ...pipelinesRoute,
+    ...subscribersRoute,
 ]
