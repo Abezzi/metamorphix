@@ -86,9 +86,8 @@ you can also execute SQL commands directly into the postgres container by runnin
 docker compose exec postgres psql -U postgres -d metamorphix
 ```
 
-### NOTE: If migrations don't work
-
-you probably deleted the migrations folder or the schema doesn't exist, so please recreate it and run docker compose again.
+> [!NOTE]
+> If migrations don't work you probably deleted the migrations folder or the schema doesn't exist, so please recreate it and run docker compose again.
 
 ```bash
 docker docker compose exec postgres psql -U postgres -d metamorphix
