@@ -26,14 +26,27 @@
 
 ![Frontend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/frontend-ci.yml/badge.svg)
 
-# Setup
+### Data Flow Example
 
-## Pre Requisites
+1. User creates a Pipeline with a unique sourceUrl
+2. External system sends a POST to POST /api/webhooks/{sourceUrl}
+3. API validates the pipeline, creates a Job record, and queues it
+4. Worker picks up the job:
+
+- Executes the configured actionType (e.g. transform)
+- For each subscriber, attempts delivery with retries
+- Logs results in delivery_attempts
+
+5. User can query job status and history via the API
+
+## Setup
+
+### Pre Requisites
 
 - Docker
 - Docker Compose plugin
 
-## Installation
+### Installation
 
 clone the repository
 
@@ -196,4 +209,135 @@ curl -X POST http://localhost:3000/api/webhooks/your-unique-source-url \
 
 ## Architecture
 
-## Design Decisions
+Metamorphix is built as a modern, scalable webhook processing pipeline with a clean separation of concerns.
+
+### High level overview
+
+The system follows an event-driven, asynchronous architecture:
+
+1. Inbound Webhook → Queue → Background Worker → Processing → Delivery to Subscribers
+
+This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.
+
+### System Components
+
+| Components        | Techonology                                            | Responsability                                             |
+| ----------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
+| API Server        | Node.js + Express + TypeScript                         | Handles CRUD operations, authentication, webhook ingestion |
+| Background Worker | Node.js + BullMQ (Redis)                               | Processes jobs asynchronously                              |
+| Database          | PostgreSQL + Drizzle ORM                               | Persistent storage for pipelines, jobs, deliveries         |
+| Cache/Queue       | Redis                                                  | Job queue + rate limiting + sessions                       |
+| Frontend          | React + Vite + TypeScript + TailwindCSS + ReduxToolkit | User interface for managing pipelines & monitoring         |
+| Containerization  | Docker with Docker Compose plugin                      | Reproducible local & production setup                      |
+
+### Project Structure
+
+```bash
+backend/
+├── src/
+│   ├── db/                  # Database layer
+│   │   ├── schema.ts        # Drizzle schema (users, pipelines, jobs, etc.)
+│   │   ├── migrations/      # Auto-generated migrations
+│   │   └── queries/         # Reusable database queries
+│   ├── routes/              # Route definitions
+│   │   ├── handlers/        # Business logic per feature
+│   │   └── *.ts             # Route registration
+│   ├── middlewares/         # Auth, validation, error handling
+│   ├── utils/               # Helpers (processors, retry logic, etc.)
+│   ├── worker.ts            # Background job processor
+│   ├── index.ts             # Express app entry point
+│   └── config.ts            # Environment configuration
+├── Dockerfile
+└── drizzle.config.ts
+```
+
+```bash
+frontend/
+├── public                        # Static resource
+│   ├── img                       # Images
+│   ├── data                      # Static data
+│   └── ...                       # Other static files
+├── src
+│   ├── @types                    # type files that share across the temeplate
+│   │   ├── ...
+│   ├── assets                    # App static resource
+│   │   ├── maps                  # Map meta data
+│   │   ├── markdown              # Markdown files
+│   │   ├── styles                # Global CSS files
+│   │   └── svg	                  # SVG files
+│   ├── components                # General components
+│   │   ├── docs                  # Documentations related components
+│   │   ├── layout                # Layout components
+│   │   ├── route                 # Components related to route
+│   │   ├── shared                # Upper level components built on top of ui components
+│   │   ├── template              # Template components, such as Header, Footer, Nav, etc...
+│   │   └── ui                    # Bottom level components, such as Button, Dropdown, etc...
+│   ├── configs                   # Configuration files
+│   │   ├── navigation.config     # Sidebar Navigation
+│   │   └── routes.config         # Routes where you link path and views
+│   ├── constants                 # Constant files
+│   │   └── ...
+│   ├── locales                   # Localization configuration
+│   │   ├── lang
+│   │   │   └── ...               # Language JSON files
+│   │   └── index.ts              # Localization entry file
+│   ├── services                  # Service files for managing API integrations
+│   │   ├── ApiService.ts         # Api request & response handler
+│   │   ├── BaseService.ts        # Axios configs & interceptors
+│   │   ├── JobService.ts         # Job related API request
+│   │   ├── SubscriberService.ts        # Subscriber related API request
+│   │   ├── DeliveryAttemptService.ts        # Delivery Attempts related API request
+│   │   └── PipelineService.ts                   # Pipeline related API request
+│   ├── store                     # Main Redux store
+│   │   ├── slices                # Genaral slices
+│   │   │   └── ...
+│   │   ├── hook.ts               # Store hook file
+│   │   ├── index.ts              # Store entry file
+│   │   └── rootReducer.ts        # Root reducer
+│   │   └── storeSetup.ts         # Overall store setup
+│   ├── utils                     # All reusable function & hooks
+│   │   ├── hooks                 # Hooks
+│   │   │   └── ...
+│   │   └── ...                   # Reusable functions
+│   ├── views                     # View files that render all the pages
+│   │   ├── ...                   # All view files
+│   │   └── index.ts              # View entry point
+│   │   App.tsx                   # App setup
+│   │   index.css                 # Css entry
+│   │   main.tsx                  # React entry
+│   │   mdDynamicImporter.tsx     # Dynamic md file import handling
+│   └── vite-env.d.ts             # Vite environment declaration
+├── .twSafelistGenerator          # Tailwind middleware for safe list
+├── .eslintignore                 # Ignore file for eslint
+├── .eslintrc.cjs                 # eslint config
+├── .gitignore                    # Ignore file for git
+├── .prettierignore               # Ignore file for prettier
+├── .prettierrc                   # Prettier config
+├── index.html                    # Entry file for the web
+├── package.json
+├── package.lock.json
+├── postcss.config.cjs            # PostCss configuration file
+├── README.md
+├── safelist.txt                  # A generated whitelist classes for Tailwind css
+├── tailwind.config.cjs           # TailwindCSS configuration file
+├── tsconfig.eslint.json          # Typescript config for eslint
+├── tsconfig.json                 # Project Typescript configuration file
+├── tsconfig.eslint.json          # Typescript config for node
+└── vite.config.ts                # Config file for vite
+```
+
+### Design Decisions
+
+- Separation of Concerns: API layer is thin. All business logic lives in handlers/ and reusable processors.
+- Asynchronous Processing: Webhooks never block. Jobs are queued and processed by dedicated workers.
+- Reliability:
+  - Exponential backoff retries on delivery failures
+  - Detailed logging of every delivery attempt
+  - Job status tracking (queued → processing → completed | failed)
+- Extensibility: Easy to add new actionType processors (transform, filter, enrich, etc.) via a registry pattern.
+- Security: JWT authentication, API keys, input validation, and proper error handling.
+- Observability: Health checks, job history, and delivery logs.
+
+### Mermaid Architecture Diagram
+
+![mermaid architecture diagram](./mermaid-diagram.svg)
