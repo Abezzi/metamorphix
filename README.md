@@ -1,6 +1,6 @@
 <div align="center">
-  <h2>Metamorphix</h2>
   <img src="./metamorphix-logo.png" alt="logo image" width="300" height="300"/>
+  <h2>Metamorphix</h2>
   <h3>Webhook-Driven Task Processing Pipeline</h3>
 </div>
 
@@ -42,6 +42,10 @@ Think of it as a simplified, open-source Zapier — but focused on developer-fri
 - Logs results in delivery_attempts
 
 5. User can query job status and history via the API
+
+### Demo Video
+
+- Check out the Demo [here](https://youtu.be/vW7CmRLKIM8)
 
 ## Setup
 
