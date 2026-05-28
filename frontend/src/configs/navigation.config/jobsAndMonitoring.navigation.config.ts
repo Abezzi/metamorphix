@@ -1,6 +1,9 @@
 import type { NavigationTree } from '@/@types/navigation'
 import { NAV_ITEM_TYPE_TITLE } from '@/constants/navigation.constant'
-import { JOBS_AND_MONITORING_PREFIX_PATH } from '@/constants/route.constant'
+import {
+  DELIVERY_ATTEMPTS_PREFIX_PATH,
+  JOBS_AND_MONITORING_PREFIX_PATH,
+} from '@/constants/route.constant'
 
 const jobsAndMonitoringNavigationConfig: NavigationTree[] = [
   {
@@ -34,7 +37,7 @@ const jobsAndMonitoringNavigationConfig: NavigationTree[] = [
       },
       {
         key: 'jobsAndMonitoring.deliveryAttempts',
-        path: `${JOBS_AND_MONITORING_PREFIX_PATH}/delivery-attempts`,
+        path: `${DELIVERY_ATTEMPTS_PREFIX_PATH}/list`,
         title: 'Delivery Attempts',
         translateKey: 'nav.jobsAndMonitoring.deliveryAttempts',
         icon: 'deliveryAttempts',
