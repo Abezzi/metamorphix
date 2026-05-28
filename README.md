@@ -1,5 +1,6 @@
 <div align="center">
   <h2>Metamorphix</h2>
+  <img src="./metamorphix-logo.png" alt="logo image"/>
   <h3>Webhook-Driven Task Processing Pipeline</h3>
 </div>
 
@@ -26,6 +27,9 @@
 
 ![Frontend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/frontend-ci.yml/badge.svg)
 
+Metamorphix is a lightweight, self-hosted automation platform that lets you receive webhooks, process them through configurable actions in the background, and forward the results to one or more destinations.
+Think of it as a simplified, open-source Zapier — but focused on developer-friendly webhook pipelines with full control, transparency, and reliability.
+
 ### Data Flow Example
 
 1. User creates a Pipeline with a unique sourceUrl
@@ -45,6 +49,7 @@
 
 - Docker
 - Docker Compose plugin
+- Insomnia, Postman or curl to test endpoints during development
 
 ### Installation
 
@@ -243,7 +248,7 @@ The system follows an event-driven, asynchronous architecture:
 
 1. Inbound Webhook → Queue → Background Worker → Processing → Delivery to Subscribers
 
-This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.
+This design ensures the webhook ingestion is fast and non-blocking (returns 202 Accepted immediately), while heavy processing happens in the background.
 
 ### System Components
 
