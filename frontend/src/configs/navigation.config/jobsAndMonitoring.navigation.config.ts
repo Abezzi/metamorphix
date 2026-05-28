@@ -16,16 +16,6 @@ const jobsAndMonitoringNavigationConfig: NavigationTree[] = [
     authority: [],
     subMenu: [
       {
-        key: 'jobsAndMonitoring.activeJobs',
-        path: `${JOBS_AND_MONITORING_PREFIX_PATH}/active-jobs`,
-        title: 'Active Jobs',
-        translateKey: 'nav.jobsAndMonitoring.activeJobs',
-        icon: 'activeJobs',
-        type: NAV_ITEM_TYPE_TITLE,
-        authority: [],
-        subMenu: [],
-      },
-      {
         key: 'jobsAndMonitoring.jobHistory',
         path: `${JOBS_AND_MONITORING_PREFIX_PATH}/job-history`,
         title: 'Job History',

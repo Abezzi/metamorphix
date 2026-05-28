@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getJobByIdHandler } from "./handlers/job.handlers.js";
+import {
+  getAllJobsHandler,
+  getJobByIdHandler,
+} from "./handlers/job.handlers.js";
+import { requireAuth } from "../middlewares/auth.js";
 
 const router = Router();
 
+router.get("/", requireAuth, getAllJobsHandler);
 router.get("/:id", getJobByIdHandler);
-// router.get("/", requireAuth, getAllPipelinesHandler);
 
 export default router;

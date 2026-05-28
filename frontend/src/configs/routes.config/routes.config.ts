@@ -4,6 +4,7 @@ import type { Routes } from '@/@types/routes'
 import pipelinesRoute from './pipelinesRoute'
 import subscribersRoute from './subscribersRoute'
 import deliveryAttemptsRoute from './deliveryAttemptsRoute'
+import jobsAndMonitoringRoute from './jobsAndMonitoringRoute'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -17,4 +18,5 @@ export const protectedRoutes = [
     ...pipelinesRoute,
     ...subscribersRoute,
     ...deliveryAttemptsRoute,
+    ...jobsAndMonitoringRoute,
 ]
