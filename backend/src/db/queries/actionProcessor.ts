@@ -1,6 +1,6 @@
 import { db } from "../index.js";
-import { jobs, pipelines } from "../schema.js";
-import { eq } from "drizzle-orm";
+import { jobs, pipelines, subscribers } from "../schema.js";
+import { eq, sql } from "drizzle-orm";
 import { JobService } from "../queries/jobs.js";
 import { deliveryService } from "../queries/deliveries.js";
 
@@ -213,66 +213,73 @@ export const actionProcessor = new ActionProcessor();
  * Main function called by the Worker
  */
 export async function processPipelineJob(jobId: string, pipelineId: string) {
-  const jobService = new JobService();
+  const job = await db.query.jobs.findFirst({
+    where: eq(jobs.id, jobId),
+    with: { pipeline: true },
+  });
+
+  if (!job) throw new Error("Job not found");
 
   try {
-    // 1. Mark as processing
-    await db
-      .update(jobs)
-      .set({ status: "processing", startedAt: new Date() })
-      .where(eq(jobs.id, jobId));
-
-    // 2. Get full pipeline with subscribers
-    const pipeline = await jobService.getPipelineWithSubscribers(pipelineId);
-    if (!pipeline) throw new Error("Pipeline not found");
-
-    const job = await jobService.getById(jobId);
-    if (!job) throw new Error("Job not found");
-
-    // 3. Execute the configured action
-    const actionResult = await actionProcessor.execute(
-      pipeline,
+    // Execute the action only
+    const outputPayload = await actionProcessor.execute(
+      job.pipeline,
       job.inputPayload,
     );
 
-    let finalPayload = job.inputPayload;
-
-    if (actionResult.success) {
-      finalPayload = actionResult.outputPayload;
-    } else {
-      throw new Error(actionResult.error || "Action execution failed");
-    }
-
-    // 4. Update job with result
     await db
       .update(jobs)
       .set({
-        outputPayload: finalPayload,
         status: "completed",
+        outputPayload: outputPayload ?? job.inputPayload,
         completedAt: new Date(),
       })
       .where(eq(jobs.id, jobId));
 
-    // 5. Deliver to subscribers with retry logic
-    if (pipeline.subscribersIds && pipeline.subscribersIds.length > 0) {
-      await deliveryService.deliverWithRetry(
-        jobId,
-        pipeline.subscribersIds,
-        finalPayload,
-      );
-    }
+    console.log(`✅ Job ${jobId} processed successfully`);
 
-    console.log(`✅ Job ${jobId} processed and delivered successfully`);
+    return {
+      success: true,
+      outputPayload: outputPayload ?? job.inputPayload,
+      pipelineId: pipelineId,
+    };
   } catch (error: any) {
-    console.error(`❌ Job ${jobId} failed:`, error);
-
     await db
       .update(jobs)
-      .set({
-        status: "failed",
-        error: error.message,
-        completedAt: new Date(),
-      })
+      .set({ status: "failed", error: error.message })
       .where(eq(jobs.id, jobId));
+
+    throw error;
   }
+}
+
+async function getPipelineWithSubscribers(pipelineId: string) {
+  const result = await db
+    .select({
+      pipeline: pipelines,
+      subscriber: subscribers,
+    })
+    .from(pipelines)
+    .leftJoin(
+      subscribers,
+      sql`${subscribers.id} = ANY(${pipelines.subscribersIds})`,
+    )
+    .where(eq(pipelines.id, pipelineId));
+
+  if (result.length === 0) return null;
+
+  // Group subscribers
+  const pipelineData = result[0].pipeline;
+  const uniqueSubscribers = Array.from(
+    new Map(
+      result
+        .filter((row) => row.subscriber !== null)
+        .map((row) => [row.subscriber!.id, row.subscriber]),
+    ).values(),
+  );
+
+  return {
+    pipeline: pipelineData,
+    subscribers: uniqueSubscribers,
+  };
 }

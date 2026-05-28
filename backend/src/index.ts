@@ -15,6 +15,7 @@ import userRouter from "./routes/users.js";
 import webhookRouter from "./routes/webhook.js";
 import jobsRouter from "./routes/jobs.js";
 import subscribersRouter from "./routes/subscriber.js";
+import deliveriesRouter from "./routes/deliveries.js";
 
 const app = express();
 const PORT = 3000;
@@ -52,6 +53,7 @@ apiRouter.use("/users", userRouter);
 apiRouter.use("/webhooks", webhookRouter);
 apiRouter.use("/jobs", jobsRouter);
 apiRouter.use("/subscribers", subscribersRouter);
+apiRouter.use("/delivery-attempts", deliveriesRouter);
 
 // mount the main api router
 app.use("/api", apiRouter);

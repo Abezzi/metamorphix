@@ -22,7 +22,7 @@ export const createPipelineHandler = asyncHandler(
       actionType,
       actionConfig,
       isActive,
-      subscribers,
+      subscribersIds,
     } = req.body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
@@ -60,7 +60,7 @@ export const createPipelineHandler = asyncHandler(
       actionType: actionType as any,
       actionConfig: actionConfig || {},
       isActive: isActive || false,
-      subscribers: subscribers || [],
+      subscribersIds: subscribersIds || [],
     };
 
     const pipeline = await service.create(createData, user.id);

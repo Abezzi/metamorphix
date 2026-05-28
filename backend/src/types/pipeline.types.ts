@@ -18,11 +18,7 @@ export interface CreatePipelineDto {
   actionType: ActionType;
   actionConfig?: Record<string, any>;
   isActive: boolean;
-  subscribers?: Array<{
-    url: string;
-    method?: string;
-    headers?: Record<string, string>;
-  }>;
+  subscribersIds?: Array<string>;
 }
 
 export interface UpdatePipelineDto {

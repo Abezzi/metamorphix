@@ -38,6 +38,7 @@ export class PipelineService {
         actionType: data.actionType,
         actionConfig: data.actionConfig || {},
         isActive: data.isActive || false,
+        subscribersIds: data.subscribersIds || [],
         userId,
       })
       .returning();

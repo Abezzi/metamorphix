@@ -1,5 +1,9 @@
 import { Worker, Job as BullJob } from "bullmq";
 import { processPipelineJob } from "./db/queries/actionProcessor.js";
+import { db } from "./db/index.js";
+import { pipelines, subscribers } from "./db/schema.js";
+import { eq, inArray } from "drizzle-orm";
+import { deliveryService } from "./db/queries/deliveries.js";
 
 // initialize the background worker
 const worker = new Worker(
@@ -15,11 +19,60 @@ const worker = new Worker(
     );
 
     try {
-      await processPipelineJob(jobId, pipelineId);
-      console.log(`[Worker] ✅ Successfully completed job ${jobId}`);
-    } catch (error) {
-      console.error(`[Worker] ❌ Failed to process job ${jobId}:`, error);
-      throw error; // Important: Let BullMQ handle retries
+      // 1. Process the action
+      const result = await processPipelineJob(jobId, pipelineId);
+
+      // 2. Fetch pipeline + subscribers
+      const pipeline = await db.query.pipelines.findFirst({
+        where: eq(pipelines.id, pipelineId),
+        columns: { id: true, name: true, subscribersIds: true },
+      });
+
+      if (!pipeline) throw new Error(`Pipeline ${pipelineId} not found`);
+
+      console.log(`[Worker] Pipeline subscribersIds:`, pipeline.subscribersIds);
+
+      // 3. Fetch valid subscribers
+      let subscriberList: any[] = [];
+
+      if (pipeline.subscribersIds?.length > 0) {
+        const rawSubs = await db.query.subscribers.findMany({
+          where: inArray(subscribers.id, pipeline.subscribersIds),
+        });
+
+        subscriberList = rawSubs.filter(
+          (sub): sub is any =>
+            sub != null && Boolean(sub?.id) && Boolean(sub?.url?.trim()),
+        );
+
+        console.log(
+          `[Worker] Valid subscribers: ${subscriberList.length}/${rawSubs.length}`,
+        );
+        console.log(
+          `[Worker] Subscribers:`,
+          subscriberList.map((s) => ({ id: s.id, url: s.url })),
+        );
+      }
+
+      // 4. Deliver
+      if (subscriberList.length > 0 && result.outputPayload) {
+        console.log(
+          `[Worker] 📤 Delivering to ${subscriberList.length} subscriber(s)`,
+        );
+        await deliveryService.deliverWithRetry(
+          jobId,
+          subscriberList,
+          result.outputPayload,
+        );
+        console.log(`[Worker] 📬 Delivery completed`);
+      } else {
+        console.log(`[Worker] ⚠️ No valid subscribers for this pipeline`);
+      }
+
+      console.log(`[Worker] ✅ Job ${jobId} completed successfully`);
+    } catch (error: any) {
+      console.error(`[Worker] ❌ Job ${jobId} failed:`, error.message);
+      throw error;
     }
   },
   {
@@ -28,11 +81,7 @@ const worker = new Worker(
       port: Number(process.env.REDIS_PORT) || 6379,
     },
     concurrency: 5,
-    limiter: {
-      // max jobs per duration
-      max: 50,
-      duration: 10000,
-    },
+    limiter: { max: 50, duration: 10000 },
   },
 );
 
