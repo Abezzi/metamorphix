@@ -55,6 +55,32 @@ git clone https://github.com/Abezzi/metamorphix.git
 cd metamorphix
 ```
 
+### Configure your Enverionment file (.env)
+
+generate a secret JWT from your terminal by running:
+
+```bash
+openssl rand -base64 64
+```
+
+for example, your .env file should look like this:
+
+```bash
+# DB
+DB_URL="postgres://postgres:postgres@postgres:5432/metamorphix?sslmode=disable"
+PLATFORM="dev"
+JWT_SECRET="" # YOUR JWT HERE
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# App
+NODE_ENV=development
+PORT=3000
+```
+
 start docker
 
 ```bash
