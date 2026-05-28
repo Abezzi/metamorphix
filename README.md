@@ -1,6 +1,6 @@
 <div align="center">
   <h2>Metamorphix</h2>
-  <img src="./metamorphix-logo.png" alt="logo image"/>
+  <img src="./metamorphix-logo.png" alt="logo image" width="300" height="300"/>
   <h3>Webhook-Driven Task Processing Pipeline</h3>
 </div>
 
