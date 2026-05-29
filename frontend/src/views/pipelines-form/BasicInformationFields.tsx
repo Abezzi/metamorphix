@@ -3,13 +3,18 @@ import RichTextEditor from '@/components/shared/RichTextEditor'
 import Input from '@/components/ui/Input'
 import { FormItem } from '@/components/ui/Form'
 import { Field, FormikErrors, FormikTouched, FieldProps } from 'formik'
-import { Switcher } from '@/components/ui'
+import { Select, Switcher } from '@/components/ui'
+import { injectReducer } from '@/store'
+import reducer, { useAppSelector } from '../subscribers/store'
+
+injectReducer('subscribers', reducer)
 
 type FormFieldsName = {
   name: string
   description: string
   actionType: string
   actionConfig: string
+  subscribersIds: string[]
   isActive: boolean
 }
 
@@ -18,8 +23,22 @@ type BasicInformationFields = {
   errors: FormikErrors<FormFieldsName>
 }
 
+type Option = {
+  value: string
+  label: string
+}
+
 const BasicInformationFields = (props: BasicInformationFields) => {
   const { touched, errors } = props
+
+  const data = useAppSelector(
+    (state) => state.subscribers.data.subscriberList,
+  )
+
+  const subscriberOptions: Option[] = data.map((subscriber: any) => ({
+    value: subscriber.id,
+    label: subscriber.url,
+  }))
 
   return (
     <AdaptableCard divider className="mb-4">
@@ -84,6 +103,34 @@ const BasicInformationFields = (props: BasicInformationFields) => {
           component={Input}
         />
       </FormItem>
+
+      <FormItem
+        label="Subscribers"
+        invalid={
+          (errors.subscribersIds && touched.subscribersIds) as boolean
+        }
+        errorMessage={errors.subscribersIds as string}
+      >
+        <Field name="subscribersIds">
+          {({ field, form }: FieldProps) => (
+            <Select
+              isMulti
+              options={subscriberOptions}
+              value={subscriberOptions.filter((opt) =>
+                field.value?.includes(opt.value),
+              )}
+              onChange={(selected: any) => {
+                const ids = selected
+                  ? selected.map((opt: any) => opt.value)
+                  : []
+                form.setFieldValue(field.name, ids)
+              }}
+              placeholder="Select one or more subscribers..."
+            />
+          )}
+        </Field>
+      </FormItem>
+
       <FormItem
         label="Active"
         invalid={(errors.isActive && touched.isActive) as boolean}
