@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./metamorphix-logo.png" alt="logo image" width="300" height="300"/>
+  <img src="./extra/metamorphix-logo.png" alt="logo image" width="300" height="300"/>
   <h2>Metamorphix</h2>
   <h3>Webhook-Driven Task Processing Pipeline</h3>
 </div>
@@ -375,4 +375,4 @@ frontend/
 
 ### Mermaid Architecture Diagram
 
-![mermaid architecture diagram](./mermaid-diagram.svg)
+![mermaid architecture diagram](./extra/mermaid-diagram.svg)
