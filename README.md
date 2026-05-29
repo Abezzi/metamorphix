@@ -23,9 +23,12 @@
   <img width="12" />
 </div>
 
-![Backend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/backend-ci.yml/badge.svg)
+<div align="center">
 
+![Backend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/backend-ci.yml/badge.svg)
 ![Frontend Tests Status](https://github.com/Abezzi/metamorphix/actions/workflows/frontend-ci.yml/badge.svg)
+
+</div>
 
 Metamorphix is a lightweight, self-hosted automation platform that lets you receive webhooks, process them through configurable actions in the background, and forward the results to one or more destinations.
 Think of it as a simplified, open-source Zapier — but focused on developer-friendly webhook pipelines with full control, transparency, and reliability.
