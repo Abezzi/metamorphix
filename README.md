@@ -48,7 +48,7 @@ Think of it as a simplified, open-source Zapier — but focused on developer-fri
 
 ### Demo Video
 
-- Check out the Demo [here](https://youtu.be/vW7CmRLKIM8)
+- Check out the Demo [here](https://youtu.be/6c5gOvtruV0)
 
 ## Setup
 
