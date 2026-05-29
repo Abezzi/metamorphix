@@ -1,3 +1,4 @@
+import { translate } from "@vitalets/google-translate-api";
 import { db } from "../index.js";
 import { jobs } from "../schema.js";
 import { eq } from "drizzle-orm";
@@ -18,7 +19,7 @@ export class ActionProcessor {
 
       switch (actionType) {
         case "transform":
-          outputPayload = this.transformData(inputPayload, actionConfig);
+          outputPayload = await this.transformData(inputPayload, actionConfig);
           break;
 
         case "filter":
@@ -56,12 +57,13 @@ export class ActionProcessor {
   }
 
   // action 1: transform - field mapping, renaming, adding/removing fields
-  private transformData(payload: any, config: any): any {
+  private async transformData(payload: any, config: any): Promise<any> {
     if (!payload || typeof payload !== "object") return payload;
 
     const {
       operation = "map",
       field = "text",
+      targetLang = "ar",
       fieldMapping = {},
       addFields = {},
       removeFields = [],
@@ -84,6 +86,8 @@ export class ActionProcessor {
           ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
           : text,
       );
+    } else if (operation === "translate" || operation === "toArabic") {
+      result = await this.applyTranslation(result, field, targetLang);
     }
 
     // field mapping / renaming
@@ -134,6 +138,41 @@ export class ActionProcessor {
       }
     }
 
+    return result;
+  }
+
+  private async applyTranslation(
+    payload: any,
+    fieldPath: string,
+    targetLang: string,
+  ): Promise<any> {
+    const result = { ...payload };
+
+    if (fieldPath in result && typeof result[fieldPath] === "string") {
+      const text = result[fieldPath].trim();
+      if (!text) return result;
+
+      try {
+        const res = await translate(text, { to: targetLang });
+
+        result[`${fieldPath}_ar`] = res.text;
+        result.translatedFrom = "en";
+        result.translatedTo = targetLang;
+
+        // Safe way to access nested properties (avoids TS error)
+        const fromLang = (res as any).from?.language?.iso || "unknown";
+        result.detectedSourceLang = fromLang;
+
+        // Optional: confidence / correction info
+        if ((res as any).from?.language?.didYouMean) {
+          result.translationNote = "Auto-corrected by Google Translate";
+        }
+      } catch (err: any) {
+        console.error("Translation failed:", err.message);
+        result.translationError = err.message;
+        result[`${fieldPath}_ar`] = "[Translation failed]";
+      }
+    }
     return result;
   }
 
