@@ -178,29 +178,60 @@ export class ActionProcessor {
 
   // action 2: filter - Keep only items that match conditions
   private filterData(payload: any, config: any): any {
-    const { condition = {}, keepIfArray = true } = config;
+    if (!payload || typeof payload !== "object") return payload;
 
-    if (Array.isArray(payload)) {
-      const filtered = payload.filter((item) => {
+    const {
+      condition = {},
+      keepIfArray = true,
+      // specify which array to filter
+      arrayField = "orders",
+    } = config;
+
+    let result = { ...payload };
+
+    // if there's a specific array field to filter
+    if (arrayField && Array.isArray(result[arrayField])) {
+      const filteredArray = result[arrayField].filter((item: any) => {
         if (typeof item !== "object" || item === null) return true;
         return Object.entries(condition).every(
           ([key, value]) => item[key] === value,
         );
       });
 
+      result[arrayField] = keepIfArray
+        ? filteredArray
+        : filteredArray[0] || null;
+
+      // add metadata
+      result.filteredCount = filteredArray.length;
+      result.originalCount = payload[arrayField].length;
+    }
+    // fallback: treat root as array
+    else if (Array.isArray(payload)) {
+      const filtered = payload.filter((item: any) => {
+        if (typeof item !== "object" || item === null) return true;
+        return Object.entries(condition).every(
+          ([key, value]) => item[key] === value,
+        );
+      });
       return keepIfArray ? filtered : filtered[0] || null;
     }
+    // single object
+    else {
+      const matches = Object.entries(condition).every(
+        ([key, value]) => payload[key] === value,
+      );
+      return matches ? payload : null;
+    }
 
-    // Single object
-    const matches = Object.entries(condition).every(
-      ([key, value]) => payload[key] === value,
-    );
-    return matches ? payload : null;
+    result.processedAt = new Date().toISOString();
+    result.processedBy = "Metamorphix";
+    result.action = "filter";
+
+    return result;
   }
 
-  /**
-   * Action 3: Enrich - Add computed / mock external data
-   */
+  // action 3: enrich - add computed / mock external data
   private async enrichData(payload: any, config: any): Promise<any> {
     const { enrichFields = [] } = config;
     let result = { ...payload };
@@ -232,9 +263,7 @@ export class ActionProcessor {
     return result;
   }
 
-  /**
-   * Action 4: Summarize - Create summary of the data
-   */
+  // action 4: summarize - create summary of the data
   private summarizeData(payload: any, config: any): any {
     if (Array.isArray(payload)) {
       return {
