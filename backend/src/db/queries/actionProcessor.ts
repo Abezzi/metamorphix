@@ -1,8 +1,6 @@
 import { db } from "../index.js";
-import { jobs, pipelines, subscribers } from "../schema.js";
-import { eq, sql } from "drizzle-orm";
-import { JobService } from "../queries/jobs.js";
-import { deliveryService } from "../queries/deliveries.js";
+import { jobs } from "../schema.js";
+import { eq } from "drizzle-orm";
 
 export type ActionResult = {
   success: boolean;
@@ -11,9 +9,7 @@ export type ActionResult = {
 };
 
 export class ActionProcessor {
-  /**
-   * Main entry point - executes the correct action based on actionType
-   */
+  // main entry point - executes the correct action based on actionType
   async execute(pipeline: any, inputPayload: any): Promise<ActionResult> {
     const { actionType, actionConfig } = pipeline;
 
@@ -59,17 +55,38 @@ export class ActionProcessor {
     }
   }
 
-  /**
-   * Action 1: Transform - Field mapping, renaming, adding/removing fields
-   */
+  // action 1: transform - field mapping, renaming, adding/removing fields
   private transformData(payload: any, config: any): any {
     if (!payload || typeof payload !== "object") return payload;
 
-    const { fieldMapping = {}, addFields = {}, removeFields = [] } = config;
+    const {
+      operation = "map",
+      field = "text",
+      fieldMapping = {},
+      addFields = {},
+      removeFields = [],
+    } = config;
 
     let result = { ...payload };
 
-    // Field mapping / renaming
+    // === TEXT TRANSFORMATIONS ===
+    if (operation === "uppercase" || operation === "toUpperCase") {
+      result = this.applyTextTransform(result, field, (text: string) =>
+        typeof text === "string" ? text.toUpperCase() : text,
+      );
+    } else if (operation === "lowercase" || operation === "toLowerCase") {
+      result = this.applyTextTransform(result, field, (text: string) =>
+        typeof text === "string" ? text.toLowerCase() : text,
+      );
+    } else if (operation === "capitalize") {
+      result = this.applyTextTransform(result, field, (text: string) =>
+        typeof text === "string"
+          ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+          : text,
+      );
+    }
+
+    // field mapping / renaming
     Object.entries(fieldMapping).forEach(([oldKey, newKey]) => {
       if (oldKey in result) {
         result[newKey as string] = result[oldKey];
@@ -77,26 +94,50 @@ export class ActionProcessor {
       }
     });
 
-    // Add new fields
+    // add new fields
     Object.entries(addFields).forEach(([key, value]) => {
       result[key] = value;
     });
 
-    // Remove fields
+    // remove fields
     removeFields.forEach((field: string) => {
       delete result[field];
     });
 
-    // Add metadata
+    // add metadata
     result.processedAt = new Date().toISOString();
     result.processedBy = "Metamorphix";
 
     return result;
   }
 
-  /**
-   * Action 2: Filter - Keep only items that match conditions
-   */
+  // helper: apply text transformation to a field (supports nested paths later)
+  private applyTextTransform(
+    payload: any,
+    fieldPath: string,
+    transformFn: (text: string) => string,
+  ): any {
+    const result = { ...payload };
+
+    // Simple case: top-level field
+    if (fieldPath in result) {
+      const value = result[fieldPath];
+      if (typeof value === "string") {
+        result[fieldPath] = transformFn(value);
+      } else if (typeof value === "object" && value !== null) {
+        // If it's an object, try to transform common text fields inside
+        Object.keys(value).forEach((key) => {
+          if (typeof value[key] === "string") {
+            value[key] = transformFn(value[key]);
+          }
+        });
+      }
+    }
+
+    return result;
+  }
+
+  // action 2: filter - Keep only items that match conditions
   private filterData(payload: any, config: any): any {
     const { condition = {}, keepIfArray = true } = config;
 
@@ -206,12 +247,9 @@ export class ActionProcessor {
   }
 }
 
-// Singleton
+// singleton
 export const actionProcessor = new ActionProcessor();
-
-/**
- * Main function called by the Worker
- */
+// main function called by the worker
 export async function processPipelineJob(jobId: string, pipelineId: string) {
   const job = await db.query.jobs.findFirst({
     where: eq(jobs.id, jobId),
@@ -251,35 +289,4 @@ export async function processPipelineJob(jobId: string, pipelineId: string) {
 
     throw error;
   }
-}
-
-async function getPipelineWithSubscribers(pipelineId: string) {
-  const result = await db
-    .select({
-      pipeline: pipelines,
-      subscriber: subscribers,
-    })
-    .from(pipelines)
-    .leftJoin(
-      subscribers,
-      sql`${subscribers.id} = ANY(${pipelines.subscribersIds})`,
-    )
-    .where(eq(pipelines.id, pipelineId));
-
-  if (result.length === 0) return null;
-
-  // Group subscribers
-  const pipelineData = result[0].pipeline;
-  const uniqueSubscribers = Array.from(
-    new Map(
-      result
-        .filter((row) => row.subscriber !== null)
-        .map((row) => [row.subscriber!.id, row.subscriber]),
-    ).values(),
-  );
-
-  return {
-    pipeline: pipelineData,
-    subscribers: uniqueSubscribers,
-  };
 }
